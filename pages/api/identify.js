@@ -72,17 +72,30 @@ export default async function handler(req, res) {
     })
 
     const raw = completion.choices[0].message.content.trim()
-    const cleaned = raw
-      .replace(/^```json\n?/, '')
-      .replace(/^```\n?/, '')
-      .replace(/\n?```$/, '')
-      .trim()
 
     let result
     try {
-      result = JSON.parse(cleaned)
+      // Try direct parse first
+      result = JSON.parse(raw)
     } catch {
-      return res.status(500).json({ error: 'Could not parse AI response. Try again.' })
+      // Strip markdown code fences and retry
+      const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
+      try {
+        result = JSON.parse(cleaned)
+      } catch {
+        // Last resort: extract first {...} block
+        const match = raw.match(/\{[\s\S]*\}/)
+        if (!match) {
+          console.error('[identify] unparseable response:', raw.slice(0, 200))
+          return res.status(500).json({ error: 'Could not parse AI response. Try again.' })
+        }
+        try {
+          result = JSON.parse(match[0])
+        } catch {
+          console.error('[identify] unparseable JSON block:', match[0].slice(0, 200))
+          return res.status(500).json({ error: 'Could not parse AI response. Try again.' })
+        }
+      }
     }
 
     // Increment scan count for authenticated users
