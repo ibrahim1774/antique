@@ -39,7 +39,14 @@ export default async function handler(req, res) {
       confidence: result.confidence,
       historical_context: result.historicalContext,
       makers_mark: result.makersMarkDescription,
-      search_query: result.searchQuery
+      search_query: result.searchQuery,
+      materials: result.materials,
+      condition: result.condition,
+      estimated_value_low: result.estimatedValueLow,
+      estimated_value_high: result.estimatedValueHigh,
+      value_notes: result.valueNotes,
+      authenticity: result.authenticity,
+      authenticity_signals: result.authenticitySignals,
     })
     .select()
     .single()

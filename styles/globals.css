@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -6,13 +8,14 @@
 
 html {
   font-size: 16px;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: #1A1610;
-  color: #EDE4CE;
-  font-family: system-ui, -apple-system, sans-serif;
-  line-height: 1.65;
+  background: #FBF6EC;
+  color: #1A1610;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -34,18 +37,16 @@ img {
 
 ::selection {
   background: #C8921F;
-  color: #1A1610;
+  color: #fff;
 }
 
 ::-webkit-scrollbar {
   width: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #1A1610;
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #3A2E1A;
+  background: rgba(26,22,16,0.2);
   border-radius: 3px;
 }

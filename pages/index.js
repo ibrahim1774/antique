@@ -9,11 +9,11 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Tivoro — Research Any Antique in Seconds</title>
-        <meta name="description" content="Point your camera at any antique and get instant AI-powered research — identification, era, origin, and comparable sales. Free to start." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta property="og:title" content="Tivoro — Antique Research Tool" />
-        <meta property="og:description" content="Identify any antique in seconds. Research starting point for pickers, collectors, and estate sale shoppers." />
+        <title>Tivoro — Identify Any Antique. Get Market Value. Spot Fakes.</title>
+        <meta name="description" content="AI-powered antique identifier. Snap any piece — pottery, silver, jewelry, furniture — and get instant identification, market value range, authenticity assessment, and historical context. $5/month or $39/year." />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta property="og:title" content="Tivoro — AI Antique Identifier" />
+        <meta property="og:description" content="Identify any antique. Get market value. Spot fakes. Build your collection." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -24,18 +24,11 @@ export default function Home() {
           <div className={styles.navRight}>
             {session ? (
               <>
-                <Link href="/my-scans" className={styles.navLink}>
-                  My Scans
-                </Link>
-                <Link href="/scan" className={styles.navCta}>
-                  Scan Now
-                </Link>
+                <Link href="/my-scans" className={styles.navLink}>Collection</Link>
+                <Link href="/scan" className={styles.navCta}>Scan Now</Link>
               </>
             ) : (
-              <button
-                className={styles.navCta}
-                onClick={() => signIn('google')}
-              >
+              <button className={styles.navCta} onClick={() => signIn('google')}>
                 Sign in
               </button>
             )}
@@ -43,30 +36,45 @@ export default function Home() {
         </nav>
 
         <section className={styles.hero}>
-          <div className={styles.heroBadge}>AI-Powered Research Tool</div>
+          <div className={styles.heroBadge}>AI Antique Identifier</div>
           <h1 className={styles.heroTitle}>
-            Research any antique<br />in seconds
+            Identify any antique<br />in seconds
           </h1>
           <p className={styles.heroSub}>
-            Point your camera at pottery, jewelry, furniture,
-            coins, art, or watches — and get instant identification,
-            historical context, and comparable sales data.
+            Snap a photo. Get the maker, era, origin, materials, market value range,
+            and an authenticity assessment — backed by an expert-trained AI.
           </p>
           <Link href="/scan" className={styles.heroBtn}>
-            Start scanning free
+            Scan an antique →
           </Link>
           <p className={styles.heroCap}>
-            2 free scans · No credit card · Research starting point only
+            $5/mo · 30 scans · or $39/yr · Cancel anytime
           </p>
         </section>
 
+        <section className={styles.featureRow}>
+          {[
+            { title: 'Scan & Identify',    body: 'Maker, era, origin, materials — in seconds.' },
+            { title: 'Market Value',       body: 'Realistic USD price range with comparable sold listings.' },
+            { title: 'Real vs Fake',       body: 'Authenticity assessment with specific signals.' },
+            { title: 'Manage Collection',  body: 'Save every scan. Track total estimated value.' },
+            { title: 'AI Antique Helper',  body: 'Ask anything about any piece in your collection.' },
+            { title: 'Learn & Discover',   body: 'Beginner guides and category deep-dives.' },
+          ].map(f => (
+            <div key={f.title} className={styles.featureCard}>
+              <h3 className={styles.featureTitle}>{f.title}</h3>
+              <p className={styles.featureBody}>{f.body}</p>
+            </div>
+          ))}
+        </section>
+
         <section className={styles.coverage}>
-          <p className={styles.coverageLabel}>Identifies across all categories</p>
+          <p className={styles.coverageLabel}>Identifies across every category</p>
           <div className={styles.coverageGrid}>
             {[
               'Pottery & Ceramics', 'Jewelry & Silver', 'Furniture',
               'Coins & Currency', 'Art & Prints', 'Watches & Clocks',
-              'Glassware', 'Militaria'
+              'Glassware', 'Toys & Dolls', 'Books & Maps', 'Militaria'
             ].map(cat => (
               <span key={cat} className={styles.coveragePill}>{cat}</span>
             ))}
@@ -77,21 +85,9 @@ export default function Home() {
           <h2 className={styles.sectionTitle}>How Tivoro works</h2>
           <div className={styles.steps}>
             {[
-              {
-                num: '1',
-                title: 'Take a photo',
-                body: "Point your camera at any antique — the piece itself, the maker's mark, or both."
-              },
-              {
-                num: '2',
-                title: 'AI researches it',
-                body: "Our AI identifies the piece, period, origin, and maker's marks in seconds."
-              },
-              {
-                num: '3',
-                title: 'Get a starting point',
-                body: "See what it is and what similar pieces have sold for — so you know if it's worth a closer look."
-              }
+              { num: '1', title: 'Snap a photo',         body: 'The piece, its maker mark, or both. Camera or upload.' },
+              { num: '2', title: 'AI identifies it',     body: 'Maker, period, origin, materials, condition — in seconds.' },
+              { num: '3', title: 'Get the full picture', body: 'Market value range, authenticity verdict, comparable listings.' },
             ].map(step => (
               <div key={step.num} className={styles.step}>
                 <div className={styles.stepNum}>{step.num}</div>
@@ -101,6 +97,40 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className={styles.pricing}>
+          <h2 className={styles.sectionTitle}>Simple pricing</h2>
+          <div className={styles.priceGrid}>
+            <div className={`${styles.priceCard} ${styles.priceFeatured}`}>
+              <div className={styles.priceBadge}>Best Value · Save 35%</div>
+              <div className={styles.priceLabel}>Yearly</div>
+              <div className={styles.priceMain}>
+                <span className={styles.priceAmt}>$39</span>
+                <span className={styles.priceUnit}>/year</span>
+              </div>
+              <div className={styles.priceSub}>$3.25/mo · 30 scans/month</div>
+              <Link href="/scan" className={styles.priceBtn}>Get Yearly</Link>
+            </div>
+            <div className={styles.priceCard}>
+              <div className={styles.priceLabel}>Monthly</div>
+              <div className={styles.priceMain}>
+                <span className={styles.priceAmt}>$5</span>
+                <span className={styles.priceUnit}>/month</span>
+              </div>
+              <div className={styles.priceSub}>30 scans/month</div>
+              <Link href="/scan" className={styles.priceBtn}>Get Monthly</Link>
+            </div>
+            <div className={styles.priceCard}>
+              <div className={styles.priceLabel}>Top-up</div>
+              <div className={styles.priceMain}>
+                <span className={styles.priceAmt}>$5</span>
+                <span className={styles.priceUnit}>one-time</span>
+              </div>
+              <div className={styles.priceSub}>50 additional scans</div>
+              <Link href="/scan" className={styles.priceBtn}>Add Scans</Link>
+            </div>
           </div>
         </section>
 
@@ -115,7 +145,7 @@ export default function Home() {
         <section className={styles.cta}>
           <h2 className={styles.ctaTitle}>Ready to find out what you&apos;ve got?</h2>
           <Link href="/scan" className={styles.heroBtn}>
-            Scan your first antique
+            Scan your first antique →
           </Link>
         </section>
 

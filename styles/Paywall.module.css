@@ -1,0 +1,192 @@
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(26, 22, 16, 0.72);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 0;
+}
+
+@media (min-width: 600px) {
+  .overlay { align-items: center; padding: 24px; }
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  background: #FBF6EC;
+  border-radius: 20px 20px 0 0;
+  padding: 28px 22px 24px;
+  box-shadow: 0 -20px 60px rgba(0,0,0,0.4);
+  animation: slideUp 0.3s ease-out;
+}
+
+@media (min-width: 600px) {
+  .modal { border-radius: 20px; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.closeBtn {
+  position: absolute;
+  top: 12px; right: 14px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(26,22,16,0.06);
+  border: none;
+  font-size: 22px;
+  color: #1A1610;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.brandRow { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.logo {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 20px;
+  color: #1A1610;
+  letter-spacing: -0.01em;
+}
+
+.title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 26px;
+  line-height: 1.18;
+  color: #1A1610;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #5A4F3F;
+  margin: 0 0 18px;
+  line-height: 1.5;
+}
+
+.usageStrip {
+  background: rgba(200, 146, 31, 0.12);
+  color: #8A6614;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin-bottom: 14px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.plansGrid {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.planCard {
+  position: relative;
+  text-align: left;
+  background: #fff;
+  border: 1.5px solid rgba(26,22,16,0.1);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.planCard:hover { border-color: #1A1610; transform: translateY(-1px); }
+.planCard:disabled { opacity: 0.6; cursor: wait; }
+
+.planYearly {
+  border-color: #1A1610;
+  background: linear-gradient(180deg, #FFFAF0 0%, #fff 100%);
+}
+
+.bestValueBadge {
+  position: absolute;
+  top: -10px; right: 12px;
+  background: #1A1610;
+  color: #FBF6EC;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
+
+.planLabel {
+  font-size: 13px;
+  color: #5A4F3F;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.planPriceRow { display: flex; align-items: baseline; gap: 4px; }
+.planPrice {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 32px;
+  color: #1A1610;
+  font-weight: 600;
+}
+.planCadence { color: #8A8070; font-size: 14px; }
+
+.planSub {
+  font-size: 13px;
+  color: #5A4F3F;
+  margin: 4px 0 12px;
+}
+
+.planCta {
+  background: #1A1610;
+  color: #FBF6EC;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.topupCard {
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  border: 1px dashed rgba(26,22,16,0.25);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.topupCard:disabled { opacity: 0.6; cursor: wait; }
+
+.topupLabel {
+  font-size: 12px;
+  color: #5A4F3F;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.topupRow { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
+.topupPrice { font-family: 'Fraunces', Georgia, serif; font-size: 22px; color: #1A1610; }
+.topupDetail { font-size: 14px; color: #5A4F3F; }
+.topupCta {
+  background: rgba(26,22,16,0.08);
+  color: #1A1610;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.legal {
+  font-size: 11px;
+  color: #8A8070;
+  text-align: center;
+  margin: 14px 0 0;
+  line-height: 1.5;
+}

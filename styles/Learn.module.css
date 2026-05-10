@@ -1,0 +1,122 @@
+.page {
+  min-height: 100vh;
+  background: #FBF6EC;
+  color: #1A1610;
+  font-family: 'Inter', -apple-system, sans-serif;
+  padding-bottom: 60px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(26,22,16,0.08);
+  background: #FBF6EC;
+  position: sticky; top: 0; z-index: 10;
+}
+.back {
+  font-size: 14px;
+  color: #5A4F3F;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+.title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+.heroTitle {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(36px, 8vw, 52px);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  margin: 12px 0 12px;
+}
+.heroSub {
+  font-size: 15px;
+  color: #5A4F3F;
+  line-height: 1.5;
+  margin: 0 0 28px;
+  max-width: 480px;
+}
+
+.articleList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.article {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+}
+
+.articleCat {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #C8921F;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.articleTitle {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+  color: #1A1610;
+}
+
+.articleExcerpt {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #3A3328;
+  margin: 0 0 14px;
+}
+
+.articleDetails {
+  border-top: 1px solid rgba(26,22,16,0.08);
+  padding-top: 12px;
+}
+.articleSummary {
+  font-size: 13px;
+  color: #C8921F;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+.articleSummary::-webkit-details-marker { display: none; }
+.articleSummary:hover { color: #8A6614; }
+
+.articleBody {
+  margin-top: 12px;
+}
+.articleBody p {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: #3A3328;
+  margin: 0 0 12px;
+}
+.articleBody p:last-child { margin-bottom: 0; }
+
+.footnote {
+  text-align: center;
+  font-size: 12px;
+  color: #8A8070;
+  margin: 32px 0 0;
+}

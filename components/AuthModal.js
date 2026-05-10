@@ -23,12 +23,12 @@ export default function AuthModal({ isOpen, onClose, reason }) {
         <h2 className={styles.title}>
           {reason === 'save'
             ? 'Sign in to save your collection'
-            : 'Start identifying antiques free'}
+            : 'Sign in to identify your piece'}
         </h2>
         <p className={styles.subtitle}>
           {reason === 'save'
             ? 'Your scans are saved securely to your account.'
-            : '2 free research scans. No credit card required.'}
+            : 'Create an account in one tap. Then choose a plan that fits.'}
         </p>
 
         <button

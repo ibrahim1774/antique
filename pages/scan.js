@@ -1,50 +1,68 @@
 import { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
+import { useSession, signIn } from 'next-auth/react'
 import { upload } from '@vercel/blob/client'
 import AuthModal from '../components/AuthModal'
-import UpgradeModal from '../components/UpgradeModal'
+import Paywall from '../components/Paywall'
 import styles from '../styles/Scan.module.css'
-import {
-  getLocalScanCount,
-  incrementLocalScanCount,
-  isOverLocalLimit,
-  FREE_SCAN_LIMIT
-} from '../lib/scanLimit'
 
 const LOADING_MESSAGES = [
   "Analyzing maker's marks...",
   'Checking historical records...',
   'Cross-referencing style periods...',
-  'Researching comparable pieces...',
+  'Estimating market value...',
+  'Assessing authenticity signals...',
 ]
 
 const CONFIDENCE_CONFIG = {
-  high:     { label: 'Strong match',                        color: '#6BAF7A' },
-  moderate: { label: 'Possible match',                      color: '#C8921F' },
-  low:      { label: 'Uncertain — try a clearer photo',     color: '#AF6464' },
+  high:     { label: 'Strong match',                    color: '#6BAF7A' },
+  moderate: { label: 'Possible match',                  color: '#C8921F' },
+  low:      { label: 'Uncertain — try a clearer photo', color: '#AF6464' },
 }
 
-export default function Scan() {
-  const { data: session } = useSession()
+const AUTH_CONFIG = {
+  authentic:        { label: 'Authentic',         tone: 'good', icon: '✓' },
+  likely_authentic: { label: 'Likely Authentic',  tone: 'good', icon: '✓' },
+  likely_fake:     { label: 'Likely Fake',        tone: 'bad',  icon: '!' },
+  uncertain:       { label: 'Uncertain',          tone: 'warn', icon: '?' },
+}
 
-  const [selectedFile, setSelectedFile]   = useState(null)
-  const [previewUrl,   setPreviewUrl]     = useState(null)
-  const [isLoading,    setIsLoading]      = useState(false)
-  const [loadingMsg,   setLoadingMsg]     = useState(LOADING_MESSAGES[0])
-  const [result,       setResult]         = useState(null)
-  const [error,        setError]          = useState(null)
-  const [showAuth,     setShowAuth]       = useState(false)
-  const [showUpgrade,  setShowUpgrade]    = useState(false)
-  const [saveStatus,   setSaveStatus]     = useState('idle')
-  const [scansUsed,    setScansUsed]      = useState(0)
+const CATEGORY_TAGS = ['Pottery', 'Jewelry', 'Furniture', 'Silverware', 'Coins', 'Art', 'Watches', 'Glass']
+
+export default function Scan() {
+  const { data: session, status: sessionStatus } = useSession()
+
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [previewUrl,   setPreviewUrl]   = useState(null)
+  const [isLoading,    setIsLoading]    = useState(false)
+  const [loadingMsg,   setLoadingMsg]   = useState(LOADING_MESSAGES[0])
+  const [result,       setResult]       = useState(null)
+  const [error,        setError]        = useState(null)
+  const [showAuth,     setShowAuth]     = useState(false)
+  const [showPaywall,  setShowPaywall]  = useState(false)
+  const [paywallMode,  setPaywallMode]  = useState('subscribe')
+  const [paywallData,  setPaywallData]  = useState({})
+  const [saveStatus,   setSaveStatus]   = useState('idle')
+  const [billing,      setBilling]      = useState(null)
+  const [pendingScan,  setPendingScan]  = useState(false)
 
   const loadingIntervalRef = useRef(null)
 
   useEffect(() => {
-    setScansUsed(getLocalScanCount())
-  }, [])
+    if (!session) return
+    fetch('/api/billing/status').then(r => r.ok ? r.json() : null).then(setBilling)
+  }, [session])
+
+  // Auto-trigger scan once user signs in (after attempting to scan unauthenticated)
+  useEffect(() => {
+    if (pendingScan && session && selectedFile) {
+      setPendingScan(false)
+      setShowAuth(false)
+      handleScan()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, pendingScan])
 
   useEffect(() => {
     if (isLoading) {
@@ -52,7 +70,7 @@ export default function Scan() {
       loadingIntervalRef.current = setInterval(() => {
         i = (i + 1) % LOADING_MESSAGES.length
         setLoadingMsg(LOADING_MESSAGES[i])
-      }, 2500)
+      }, 2200)
     } else {
       clearInterval(loadingIntervalRef.current)
     }
@@ -94,8 +112,10 @@ export default function Scan() {
   async function handleScan() {
     if (!selectedFile) return
 
-    if (!session && isOverLocalLimit()) {
-      setShowUpgrade(true)
+    // Step 1: must be signed in
+    if (!session) {
+      setPendingScan(true)
+      setShowAuth(true)
       return
     }
 
@@ -103,7 +123,6 @@ export default function Scan() {
     setError(null)
 
     try {
-      // Convert image to base64 and send directly — no Blob upload needed for identification
       const imageData = await new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = e => resolve(e.target.result)
@@ -114,14 +133,27 @@ export default function Scan() {
       const res = await fetch('/api/identify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: imageData })
+        body: JSON.stringify({ imageUrl: imageData }),
       })
 
       const data = await res.json()
 
-      if (res.status === 402) {
-        setShowUpgrade(true)
+      if (res.status === 401) {
         setIsLoading(false)
+        setPendingScan(true)
+        setShowAuth(true)
+        return
+      }
+
+      if (res.status === 402) {
+        setIsLoading(false)
+        setPaywallMode(data.hasSubscription ? 'topup' : 'subscribe')
+        setPaywallData({
+          monthlyUsed: data.monthlyUsed,
+          monthlyQuota: data.monthlyQuota,
+          topupScans: data.topupScans,
+        })
+        setShowPaywall(true)
         return
       }
 
@@ -132,19 +164,16 @@ export default function Scan() {
       }
 
       setResult(data)
-
-      if (!session) {
-        incrementLocalScanCount()
-        setScansUsed(getLocalScanCount())
-      }
+      // Refresh billing
+      fetch('/api/billing/status').then(r => r.ok ? r.json() : null).then(setBilling)
 
       if (typeof window !== 'undefined' && window.fbq) {
         window.fbq('trackCustom', 'AntiqueScan', {
           category: data.category,
-          confidence: data.confidence
+          confidence: data.confidence,
+          authenticity: data.authenticity,
         })
       }
-
     } catch (err) {
       setError('Something went wrong. Please check your connection and try again.')
       console.error(err)
@@ -162,16 +191,14 @@ export default function Scan() {
 
     setSaveStatus('saving')
     try {
-      // Upload to Blob now that user wants to save
       const blob = await upload(selectedFile.name, selectedFile, {
         access: 'public',
         handleUploadUrl: '/api/upload-token',
       })
-
       const res = await fetch('/api/save-scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: blob.url, result })
+        body: JSON.stringify({ imageUrl: blob.url, result }),
       })
       setSaveStatus(res.ok ? 'saved' : 'error')
     } catch {
@@ -180,7 +207,7 @@ export default function Scan() {
   }
 
   function handleShare() {
-    const text = `I just identified a ${result?.itemName} using Tivoro! ${result?.era} · ${result?.origin}. Research starting point only.`
+    const text = `I just identified a ${result?.itemName} using Tivoro! ${result?.era} · ${result?.origin}. Estimated value: $${result?.estimatedValueLow}–$${result?.estimatedValueHigh}.`
     if (navigator.share) {
       navigator.share({ text })
     } else {
@@ -189,30 +216,38 @@ export default function Scan() {
   }
 
   const conf = CONFIDENCE_CONFIG[result?.confidence] || CONFIDENCE_CONFIG.low
+  const auth = AUTH_CONFIG[result?.authenticity] || AUTH_CONFIG.uncertain
+  const valueRange = result?.estimatedValueLow != null && result?.estimatedValueHigh != null
+    ? `$${result.estimatedValueLow.toLocaleString()} – $${result.estimatedValueHigh.toLocaleString()}`
+    : null
 
   return (
     <>
       <Head>
         <title>Scan an Antique — Tivoro</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </Head>
 
       <div className={styles.page}>
 
         <AuthModal
           isOpen={showAuth}
-          onClose={() => setShowAuth(false)}
-          reason="save"
+          onClose={() => { setShowAuth(false); setPendingScan(false) }}
+          reason="scan"
         />
-        <UpgradeModal
-          isOpen={showUpgrade}
-          onClose={() => setShowUpgrade(false)}
+        <Paywall
+          isOpen={showPaywall}
+          onClose={() => setShowPaywall(false)}
+          mode={paywallMode}
+          monthlyUsed={paywallData.monthlyUsed}
+          monthlyQuota={paywallData.monthlyQuota}
+          topupScans={paywallData.topupScans}
         />
 
         {isLoading && (
           <div className={styles.loadingOverlay}>
             <div className={styles.loadingPulse} />
-            <p className={styles.loadingTitle}>Researching your piece...</p>
+            <p className={styles.loadingTitle}>Researching your piece</p>
             <p className={styles.loadingMsg}>{loadingMsg}</p>
           </div>
         )}
@@ -220,16 +255,20 @@ export default function Scan() {
         <header className={styles.header}>
           <Link href="/" className={styles.logo}>Tivoro</Link>
           <div className={styles.headerRight}>
-            {!session && scansUsed < FREE_SCAN_LIMIT && (
+            {session && billing && (
               <span className={styles.scanCounter}>
-                {FREE_SCAN_LIMIT - scansUsed} free scan
-                {FREE_SCAN_LIMIT - scansUsed !== 1 ? 's' : ''} left
+                {billing.totalScansLeft} scans left
               </span>
             )}
             {session && (
               <Link href="/my-scans" className={styles.headerLink}>
-                My Scans
+                Collection
               </Link>
+            )}
+            {!session && sessionStatus !== 'loading' && (
+              <button className={styles.signInBtn} onClick={() => signIn('google')}>
+                Sign in
+              </button>
             )}
           </div>
         </header>
@@ -238,14 +277,13 @@ export default function Scan() {
 
           {!result && (
             <div className={styles.hero}>
-              <h1 className={styles.heroTitle}>Identify any antique</h1>
+              <h1 className={styles.heroTitle}>Scan & Identify</h1>
               <p className={styles.heroSub}>
-                Take a photo or upload an image to get started
+                Snap any antique, collectible, or vintage piece. Get the maker, era, market value, and authenticity assessment in seconds.
               </p>
             </div>
           )}
 
-          {/* Idle: no file selected */}
           {!result && !isLoading && !selectedFile && (
             <div className={styles.scanZone}>
               <div
@@ -280,15 +318,13 @@ export default function Scan() {
               </div>
 
               <div className={styles.categories}>
-                {['Pottery', 'Jewelry', 'Furniture', 'Coins', 'Art', 'Watches', 'Glass']
-                  .map(c => (
-                    <span key={c} className={styles.catChip}>{c}</span>
-                  ))}
+                {CATEGORY_TAGS.map(c => (
+                  <span key={c} className={styles.catChip}>{c}</span>
+                ))}
               </div>
             </div>
           )}
 
-          {/* Preview + confirm */}
           {selectedFile && !result && !isLoading && (
             <div className={styles.previewZone}>
               <img
@@ -298,7 +334,7 @@ export default function Scan() {
               />
               <p className={styles.previewName}>{selectedFile.name}</p>
               <button className={styles.identifyBtn} onClick={handleScan}>
-                Identify this antique
+                Identify this antique →
               </button>
               <button className={styles.resetLink} onClick={reset}>
                 Choose a different photo
@@ -308,17 +344,24 @@ export default function Scan() {
 
           {error && <div className={styles.errorBox}>{error}</div>}
 
-          {/* Results */}
           {result && (
             <div className={styles.results}>
 
               <div className={styles.resultHeader}>
                 {previewUrl && (
-                  <img
-                    src={previewUrl}
-                    alt={result.itemName}
-                    className={styles.resultThumb}
-                  />
+                  <div className={styles.resultThumbWrap}>
+                    <img
+                      src={previewUrl}
+                      alt={result.itemName}
+                      className={styles.resultThumb}
+                    />
+                    {valueRange && (
+                      <div className={styles.valueStarburst}>
+                        <span className={styles.valueLabel}>VALUE</span>
+                        <span className={styles.valueAmount}>{valueRange}</span>
+                      </div>
+                    )}
+                  </div>
                 )}
                 <div className={styles.resultMeta}>
                   <span className={styles.catBadge}>{result.category}</span>
@@ -330,12 +373,31 @@ export default function Scan() {
                 </div>
               </div>
 
+              <div className={`${styles.authCard} ${styles['authCard_' + auth.tone]}`}>
+                <div className={styles.authHeader}>
+                  <span className={styles.authIcon}>{auth.icon}</span>
+                  <div>
+                    <div className={styles.authLabel}>Authenticity</div>
+                    <div className={styles.authVerdict}>{auth.label}</div>
+                  </div>
+                </div>
+                {result.authenticitySignals?.length > 0 && (
+                  <ul className={styles.authSignals}>
+                    {result.authenticitySignals.map((s, i) => (
+                      <li key={i}>{s}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
               <div className={styles.detailsCard}>
                 {[
                   { label: 'Era',           value: result.era },
                   { label: 'Origin',        value: result.origin },
+                  { label: 'Materials',     value: result.materials },
+                  { label: 'Condition',     value: result.condition },
                   { label: "Maker's mark",  value: result.makersMarkDescription || 'Not detected' },
-                ].map(({ label, value }) => (
+                ].filter(r => r.value).map(({ label, value }) => (
                   <div key={label} className={styles.detailRow}>
                     <span className={styles.detailLabel}>{label}</span>
                     <span className={styles.detailValue}>{value}</span>
@@ -343,25 +405,34 @@ export default function Scan() {
                 ))}
               </div>
 
+              {valueRange && (
+                <div className={styles.valueCard}>
+                  <div className={styles.cardLabel}>Market Value Range</div>
+                  <div className={styles.valueBig}>{valueRange}</div>
+                  {result.valueNotes && <p className={styles.valueNotes}>{result.valueNotes}</p>}
+                  <div className={styles.compareRow}>
+                    <a
+                      className={styles.compareLink}
+                      target="_blank" rel="noopener noreferrer"
+                      href={`https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(result.searchQuery)}&LH_Sold=1&LH_Complete=1`}
+                    >eBay sold</a>
+                    <a
+                      className={styles.compareLink}
+                      target="_blank" rel="noopener noreferrer"
+                      href={`https://www.amazon.com/s?k=${encodeURIComponent(result.searchQuery)}`}
+                    >Amazon</a>
+                    <a
+                      className={styles.compareLink}
+                      target="_blank" rel="noopener noreferrer"
+                      href={`https://www.google.com/search?tbm=shop&q=${encodeURIComponent(result.searchQuery)}`}
+                    >Google Shopping</a>
+                  </div>
+                </div>
+              )}
+
               <div className={styles.historyCard}>
                 <div className={styles.cardLabel}>Historical Context</div>
                 <p className={styles.historyText}>{result.historicalContext}</p>
-              </div>
-
-              <div className={styles.researchCard}>
-                <div className={styles.cardLabel}>Research Further</div>
-                <p className={styles.researchNote}>
-                  This is a starting point only — not an appraisal.
-                  Search comparable sold listings to inform your research.
-                </p>
-                <a
-                  href={`https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(result.searchQuery)}&LH_Sold=1&LH_Complete=1`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.ebayLink}
-                >
-                  Search eBay sold listings →
-                </a>
               </div>
 
               <div className={styles.disclaimer}>
@@ -376,7 +447,7 @@ export default function Scan() {
                   onClick={handleSave}
                   disabled={saveStatus === 'saved'}
                 >
-                  {saveStatus === 'idle'   && 'Save to Collection'}
+                  {saveStatus === 'idle'   && '+ Add to Collection'}
                   {saveStatus === 'saving' && 'Saving...'}
                   {saveStatus === 'saved'  && '✓ Saved'}
                   {saveStatus === 'error'  && 'Try Again'}
@@ -402,15 +473,14 @@ export default function Scan() {
             </div>
           )}
 
-          {/* How it works — only on idle */}
           {!result && !selectedFile && !isLoading && (
             <div className={styles.howSection}>
               <p className={styles.howLabel}>How it works</p>
               <div className={styles.howSteps}>
                 {[
-                  { n: '1', t: 'Take a photo',      b: 'The piece, the mark on the bottom, or both.' },
-                  { n: '2', t: 'AI researches it',  b: 'Identifies period, origin, and maker.' },
-                  { n: '3', t: 'Get a head start',  b: "Know if it's worth a closer look — before you spend a dollar." },
+                  { n: '1', t: 'Snap a photo',         b: 'The piece, the mark on the bottom, or both.' },
+                  { n: '2', t: 'AI identifies it',     b: 'Maker, period, origin, materials, condition — in seconds.' },
+                  { n: '3', t: 'Get the full picture', b: 'Market value range, authenticity assessment, comparable listings.' },
                 ].map(s => (
                   <div key={s.n} className={styles.howStep}>
                     <div className={styles.howNum}>{s.n}</div>
@@ -420,6 +490,19 @@ export default function Scan() {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              <div className={styles.featureGrid}>
+                <Link href="/helper" className={styles.featureTile}>
+                  <div className={styles.featureIcon}>💬</div>
+                  <div className={styles.featureTitle}>AI Antique Helper</div>
+                  <div className={styles.featureBody}>Ask anything about your piece.</div>
+                </Link>
+                <Link href="/learn" className={styles.featureTile}>
+                  <div className={styles.featureIcon}>📖</div>
+                  <div className={styles.featureTitle}>Learn &amp; Discover</div>
+                  <div className={styles.featureBody}>Guides for new collectors.</div>
+                </Link>
               </div>
             </div>
           )}
