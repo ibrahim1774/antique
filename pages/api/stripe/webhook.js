@@ -60,12 +60,17 @@ export default async function handler(req, res) {
         } else if (sess.mode === 'payment' && sess.metadata.type === 'topup') {
           const { data: u } = await sb
             .from('users')
-            .select('topup_scans')
+            .select('topup_scans, stripe_customer_id')
             .eq('email', email)
             .single()
-          await sb.from('users').update({
+          const update = {
             topup_scans: (u?.topup_scans || 0) + TOPUP_SCANS_PER_PURCHASE,
-          }).eq('email', email)
+          }
+          // Persist the customer ID if Stripe just created one for this purchase.
+          if (sess.customer && !u?.stripe_customer_id) {
+            update.stripe_customer_id = sess.customer
+          }
+          await sb.from('users').update(update).eq('email', email)
 
           await sendMetaEvent({
             eventName: 'Purchase',

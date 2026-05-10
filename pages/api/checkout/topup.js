@@ -19,20 +19,16 @@ export default async function handler(req, res) {
     .eq('email', session.user.email)
     .single()
 
-  let customerId = user?.stripe_customer_id
-  if (!customerId) {
-    const customer = await stripe.customers.create({
-      email: session.user.email,
-      metadata: { email: session.user.email },
-    })
-    customerId = customer.id
-    await sb.from('users').update({ stripe_customer_id: customerId }).eq('email', session.user.email)
-  }
+  // Reuse existing customer if present; otherwise tell Stripe to create one
+  // ONLY when the payment actually succeeds (customer_creation: 'if_required').
+  const customerFields = user?.stripe_customer_id
+    ? { customer: user.stripe_customer_id }
+    : { customer_email: session.user.email, customer_creation: 'if_required' }
 
   const origin = req.headers.origin || `https://${req.headers.host}`
   const checkout = await stripe.checkout.sessions.create({
     mode: 'payment',
-    customer: customerId,
+    ...customerFields,
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${origin}/billing/success?session_id={CHECKOUT_SESSION_ID}&type=topup`,
     cancel_url: `${origin}/scan`,

@@ -24,20 +24,18 @@ export default async function handler(req, res) {
     .eq('email', session.user.email)
     .single()
 
-  let customerId = user?.stripe_customer_id
-  if (!customerId) {
-    const customer = await stripe.customers.create({
-      email: session.user.email,
-      metadata: { email: session.user.email },
-    })
-    customerId = customer.id
-    await sb.from('users').update({ stripe_customer_id: customerId }).eq('email', session.user.email)
-  }
+  // Reuse existing customer if present; otherwise let Stripe create one
+  // ONLY if/when the user actually completes payment (via customer_email).
+  // For subscription mode, Stripe only materializes the Customer when the
+  // checkout completes successfully — abandoned sessions don't create one.
+  const customerFields = user?.stripe_customer_id
+    ? { customer: user.stripe_customer_id }
+    : { customer_email: session.user.email }
 
   const origin = req.headers.origin || `https://${req.headers.host}`
   const checkout = await stripe.checkout.sessions.create({
     mode: 'subscription',
-    customer: customerId,
+    ...customerFields,
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${origin}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/scan`,
