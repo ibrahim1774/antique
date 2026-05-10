@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
-import { getStripe, PRICE_IDS } from '../../../lib/stripe'
+import { getStripe, getOrCreatePrice } from '../../../lib/stripe'
 import { getSupabaseAdmin } from '../../../lib/supabase'
 
 export default async function handler(req, res) {
@@ -9,10 +9,8 @@ export default async function handler(req, res) {
   const session = await getServerSession(req, res, authOptions)
   if (!session) return res.status(401).json({ error: 'unauthorized' })
 
-  const priceId = PRICE_IDS.topup
-  if (!priceId) return res.status(500).json({ error: 'price_not_configured' })
-
   const stripe = getStripe()
+  const priceId = await getOrCreatePrice('topup')
   const sb = getSupabaseAdmin()
 
   const { data: user } = await sb
