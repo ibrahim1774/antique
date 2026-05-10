@@ -5,14 +5,14 @@
     #FBF6EC;
   color: #1A1610;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  padding-bottom: 60px;
+  padding-bottom: 24px;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 12px 20px;
   max-width: 720px;
   margin: 0 auto;
 }
@@ -58,34 +58,34 @@
 
 .hero {
   text-align: center;
-  padding: 12px 0 24px;
+  padding: 4px 0 14px;
 }
 
 .heroTitle {
   font-family: 'Fraunces', Georgia, serif;
-  font-size: clamp(40px, 9vw, 56px);
-  line-height: 1.02;
+  font-size: clamp(28px, 7vw, 38px);
+  line-height: 1.05;
   letter-spacing: -0.025em;
   font-weight: 600;
-  margin: 0 0 12px;
+  margin: 0 0 6px;
   color: #1A1610;
 }
 
 .heroSub {
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.45;
   color: #5A4F3F;
-  max-width: 420px;
+  max-width: 380px;
   margin: 0 auto;
 }
 
-.scanZone { padding: 8px 0; }
+.scanZone { padding: 0; }
 
 .dropzone {
   background: #fff;
   border: 1.5px dashed rgba(26,22,16,0.18);
   border-radius: 22px;
-  padding: 32px 20px;
+  padding: 20px 20px 16px;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0,0,0,0.03);
 }
@@ -93,7 +93,7 @@
 .scanBtnWrap { position: relative; display: inline-block; }
 .scanBtn {
   position: relative;
-  width: 84px; height: 84px;
+  width: 70px; height: 70px;
   border-radius: 50%;
   background: #FBF6EC;
   border: 2px solid #1A1610;
@@ -105,15 +105,15 @@
 .scanBtn:hover { transform: scale(1.04); }
 .fileInput { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .scanBtnLabel {
-  margin: 14px 0 0;
-  font-size: 14px;
+  margin: 10px 0 0;
+  font-size: 13px;
   font-weight: 500;
   color: #1A1610;
 }
 
 .orDivider {
   display: flex; align-items: center; gap: 12px;
-  margin: 22px 0 14px;
+  margin: 14px 0 10px;
   color: #8A8070;
   font-size: 12px;
   text-transform: uppercase;
@@ -127,15 +127,15 @@
 .dropzoneHint { font-size: 12px; color: #8A8070; margin: 0; }
 
 .categories {
-  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
-  margin-top: 20px;
+  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+  margin-top: 14px;
 }
 .catChip {
   background: rgba(26,22,16,0.06);
   color: #5A4F3F;
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
 }
 

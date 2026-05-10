@@ -266,7 +266,7 @@ export default function Scan() {
               </Link>
             )}
             {!session && sessionStatus !== 'loading' && (
-              <button className={styles.signInBtn} onClick={() => signIn('google')}>
+              <button className={styles.signInBtn} onClick={() => signIn('google', { callbackUrl: '/scan' })}>
                 Sign in
               </button>
             )}
@@ -474,36 +474,17 @@ export default function Scan() {
           )}
 
           {!result && !selectedFile && !isLoading && (
-            <div className={styles.howSection}>
-              <p className={styles.howLabel}>How it works</p>
-              <div className={styles.howSteps}>
-                {[
-                  { n: '1', t: 'Snap a photo',         b: 'The piece, the mark on the bottom, or both.' },
-                  { n: '2', t: 'AI identifies it',     b: 'Maker, period, origin, materials, condition — in seconds.' },
-                  { n: '3', t: 'Get the full picture', b: 'Market value range, authenticity assessment, comparable listings.' },
-                ].map(s => (
-                  <div key={s.n} className={styles.howStep}>
-                    <div className={styles.howNum}>{s.n}</div>
-                    <div>
-                      <div className={styles.howTitle}>{s.t}</div>
-                      <div className={styles.howBody}>{s.b}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className={styles.featureGrid}>
-                <Link href="/helper" className={styles.featureTile}>
-                  <div className={styles.featureIcon}>💬</div>
-                  <div className={styles.featureTitle}>AI Antique Helper</div>
-                  <div className={styles.featureBody}>Ask anything about your piece.</div>
-                </Link>
-                <Link href="/learn" className={styles.featureTile}>
-                  <div className={styles.featureIcon}>📖</div>
-                  <div className={styles.featureTitle}>Learn &amp; Discover</div>
-                  <div className={styles.featureBody}>Guides for new collectors.</div>
-                </Link>
-              </div>
+            <div className={styles.featureGrid} style={{ marginTop: 16 }}>
+              <Link href="/helper" className={styles.featureTile}>
+                <div className={styles.featureIcon}>💬</div>
+                <div className={styles.featureTitle}>AI Helper</div>
+                <div className={styles.featureBody}>Ask anything about your piece.</div>
+              </Link>
+              <Link href="/learn" className={styles.featureTile}>
+                <div className={styles.featureIcon}>📖</div>
+                <div className={styles.featureTitle}>Learn &amp; Discover</div>
+                <div className={styles.featureBody}>Guides for collectors.</div>
+              </Link>
             </div>
           )}
 

@@ -1,7 +1,7 @@
 import { signIn } from 'next-auth/react'
 import styles from '../styles/AuthModal.module.css'
 
-export default function AuthModal({ isOpen, onClose, reason }) {
+export default function AuthModal({ isOpen, onClose, reason, callbackUrl }) {
   if (!isOpen) return null
 
   return (
@@ -33,7 +33,7 @@ export default function AuthModal({ isOpen, onClose, reason }) {
 
         <button
           className={styles.googleBtn}
-          onClick={() => signIn('google')}
+          onClick={() => signIn('google', { callbackUrl: callbackUrl || (typeof window !== 'undefined' ? window.location.href : '/scan') })}
         >
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
