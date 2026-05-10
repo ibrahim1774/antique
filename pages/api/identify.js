@@ -4,7 +4,10 @@ import { authOptions } from './auth/[...nextauth]'
 import { getSupabaseAdmin } from '../../lib/supabase'
 import { sendMetaEvent } from '../../lib/metaPixel'
 
-export const config = { maxDuration: 60 }
+export const config = {
+  maxDuration: 60,
+  api: { bodyParser: { sizeLimit: '10mb' } }
+}
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 

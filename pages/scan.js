@@ -103,15 +103,18 @@ export default function Scan() {
     setError(null)
 
     try {
-      const blob = await upload(selectedFile.name, selectedFile, {
-        access: 'public',
-        handleUploadUrl: '/api/upload-token',
+      // Convert image to base64 and send directly — no Blob upload needed for identification
+      const imageData = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = e => resolve(e.target.result)
+        reader.onerror = reject
+        reader.readAsDataURL(selectedFile)
       })
 
       const res = await fetch('/api/identify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: blob.url })
+        body: JSON.stringify({ imageUrl: imageData })
       })
 
       const data = await res.json()
@@ -128,7 +131,6 @@ export default function Scan() {
         return
       }
 
-      data._imageUrl = blob.url
       setResult(data)
 
       if (!session) {
@@ -156,14 +158,20 @@ export default function Scan() {
       setShowAuth(true)
       return
     }
-    if (!result) return
+    if (!result || !selectedFile) return
 
     setSaveStatus('saving')
     try {
+      // Upload to Blob now that user wants to save
+      const blob = await upload(selectedFile.name, selectedFile, {
+        access: 'public',
+        handleUploadUrl: '/api/upload-token',
+      })
+
       const res = await fetch('/api/save-scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: result._imageUrl, result })
+        body: JSON.stringify({ imageUrl: blob.url, result })
       })
       setSaveStatus(res.ok ? 'saved' : 'error')
     } catch {
