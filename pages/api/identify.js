@@ -4,6 +4,8 @@ import { authOptions } from './auth/[...nextauth]'
 import { getSupabaseAdmin } from '../../lib/supabase'
 import { sendMetaEvent } from '../../lib/metaPixel'
 
+export const config = { maxDuration: 60 }
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 export default async function handler(req, res) {
