@@ -1,0 +1,24 @@
+{
+  "name": "tivoro",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.4",
+    "@vercel/blob": "^2.3.3",
+    "next": "14.2.35",
+    "next-auth": "^4.24.14",
+    "openai": "^6.37.0",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35"
+  }
+}
