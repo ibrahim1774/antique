@@ -239,9 +239,6 @@ export default function Scan() {
           isOpen={showPaywall}
           onClose={() => setShowPaywall(false)}
           mode={paywallMode}
-          monthlyUsed={paywallData.monthlyUsed}
-          monthlyQuota={paywallData.monthlyQuota}
-          topupScans={paywallData.topupScans}
         />
 
         {isLoading && (

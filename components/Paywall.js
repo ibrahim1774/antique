@@ -1,7 +1,16 @@
 import { useState } from 'react'
 import styles from '../styles/Paywall.module.css'
 
-export default function Paywall({ isOpen, onClose, mode = 'subscribe', monthlyUsed, monthlyQuota, topupScans }) {
+const PLAN_BENEFITS = [
+  'Full access to the AI antique scanner',
+  'Monthly scan credits included to get you started',
+  'Real vs Fake authenticity detection',
+  'Market value estimates with eBay & Amazon comparisons',
+  'Save your scans to a private collection',
+  'AI antique helper chat for any question',
+]
+
+export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
   const [loading, setLoading] = useState(null)
 
   if (!isOpen) return null
@@ -42,21 +51,14 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe', monthlyUs
         <h2 className={styles.title}>
           {mode === 'topup'
             ? 'Out of scans'
-            : 'Unlock unlimited identification'}
+            : 'Choose your plan'}
         </h2>
 
         <p className={styles.subtitle}>
           {mode === 'topup'
-            ? `You've used all your scans this period. Top up or upgrade to keep researching.`
+            ? 'Top up your scans or upgrade to keep researching your pieces.'
             : 'Identify any antique. Get market value. Spot fakes. Build your collection.'}
         </p>
-
-        {(monthlyUsed != null && monthlyQuota) && (
-          <div className={styles.usageStrip}>
-            {monthlyUsed} / {monthlyQuota} monthly scans used
-            {topupScans > 0 && <> · {topupScans} top-up left</>}
-          </div>
-        )}
 
         {showSub && (
           <div className={styles.plansGrid}>
@@ -65,13 +67,22 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe', monthlyUs
               onClick={() => startCheckout('/api/checkout/subscribe', { plan: 'yearly' })}
               disabled={loading !== null}
             >
-              <div className={styles.bestValueBadge}>Best Value · Save 35%</div>
-              <div className={styles.planLabel}>Yearly</div>
+              <div className={styles.discountBadge}>SAVE 35%</div>
+              <div className={styles.planHeader}>
+                <div className={styles.planLabel}>Yearly</div>
+                <div className={styles.bestPick}>Best value</div>
+              </div>
               <div className={styles.planPriceRow}>
                 <span className={styles.planPrice}>$39</span>
                 <span className={styles.planCadence}>/year</span>
+                <span className={styles.planEquiv}>≈ $3.25/mo</span>
               </div>
-              <div className={styles.planSub}>$3.25/mo · 30 scans/month</div>
+              <ul className={styles.benefitList}>
+                {PLAN_BENEFITS.slice(0, 5).map(b => (
+                  <li key={b}><span className={styles.check}>✓</span>{b}</li>
+                ))}
+                <li><span className={styles.check}>✓</span>Need more? Top up anytime for $5</li>
+              </ul>
               <div className={styles.planCta}>
                 {loading === 'yearly' ? 'Loading…' : 'Choose Yearly'}
               </div>
@@ -82,12 +93,19 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe', monthlyUs
               onClick={() => startCheckout('/api/checkout/subscribe', { plan: 'monthly' })}
               disabled={loading !== null}
             >
-              <div className={styles.planLabel}>Monthly</div>
+              <div className={styles.planHeader}>
+                <div className={styles.planLabel}>Monthly</div>
+              </div>
               <div className={styles.planPriceRow}>
                 <span className={styles.planPrice}>$5</span>
                 <span className={styles.planCadence}>/month</span>
               </div>
-              <div className={styles.planSub}>30 scans/month</div>
+              <ul className={styles.benefitList}>
+                {PLAN_BENEFITS.slice(0, 5).map(b => (
+                  <li key={b}><span className={styles.check}>✓</span>{b}</li>
+                ))}
+                <li><span className={styles.check}>✓</span>Need more? Top up anytime for $5</li>
+              </ul>
               <div className={styles.planCta}>
                 {loading === 'monthly' ? 'Loading…' : 'Choose Monthly'}
               </div>
@@ -104,10 +122,10 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe', monthlyUs
             <div className={styles.topupLabel}>One-time top-up</div>
             <div className={styles.topupRow}>
               <span className={styles.topupPrice}>$5</span>
-              <span className={styles.topupDetail}>· 50 additional scans</span>
+              <span className={styles.topupDetail}>· Extra scans, no subscription</span>
             </div>
             <div className={styles.topupCta}>
-              {loading === '/api/checkout/topup' ? 'Loading…' : 'Buy 50 scans'}
+              {loading === '/api/checkout/topup' ? 'Loading…' : 'Buy top-up'}
             </div>
           </button>
         )}

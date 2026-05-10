@@ -116,6 +116,71 @@
   letter-spacing: 0.02em;
 }
 
+.discountBadge {
+  position: absolute;
+  top: -12px; right: 12px;
+  background: linear-gradient(135deg, #C8921F 0%, #E0A82A 100%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  box-shadow: 0 4px 12px rgba(200, 146, 31, 0.4);
+  border: 2px solid #FBF6EC;
+}
+
+.planHeader {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 4px;
+}
+
+.bestPick {
+  font-size: 10px;
+  background: rgba(200, 146, 31, 0.18);
+  color: #8A6614;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.planEquiv {
+  font-size: 12px;
+  color: #8A8070;
+  margin-left: 6px;
+}
+
+.benefitList {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  font-size: 13px;
+  color: #3A3328;
+  line-height: 1.45;
+}
+.benefitList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.check {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(107, 175, 122, 0.18);
+  color: #4A7B56;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
 .planLabel {
   font-size: 13px;
   color: #5A4F3F;
