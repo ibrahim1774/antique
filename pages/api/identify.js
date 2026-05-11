@@ -7,7 +7,7 @@ import { MONTHLY_SCAN_QUOTA } from '../../lib/stripe'
 
 export const config = {
   maxDuration: 60,
-  api: { bodyParser: { sizeLimit: '10mb' } },
+  api: { bodyParser: { sizeLimit: '40mb' } },
 }
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -30,8 +30,9 @@ export default async function handler(req, res) {
   const session = await getServerSession(req, res, authOptions)
   if (!session) return res.status(401).json({ error: 'auth_required' })
 
-  const { imageUrl } = req.body
-  if (!imageUrl) return res.status(400).json({ error: 'imageUrl required' })
+  const { imageUrl, imageUrls } = req.body
+  const images = imageUrls?.length ? imageUrls : imageUrl ? [imageUrl] : []
+  if (!images.length) return res.status(400).json({ error: 'imageUrl required' })
 
   const sb = getSupabaseAdmin()
   const { data: user } = await sb
@@ -77,7 +78,7 @@ export default async function handler(req, res) {
           content: [
             {
               type: 'text',
-              text: `Identify this antique and return ONLY this exact JSON structure:
+              text: `Identify this antique from the ${images.length > 1 ? `${images.length} photos provided (different angles / details)` : 'photo provided'} and return ONLY this exact JSON structure:
 {
   "itemName": "specific name e.g. Roseville Pottery Pinecone Vase #632-6",
   "category": "one of: Pottery, Jewelry, Furniture, Silverware, Coins, Art, Watches, Glass, Toys, Books, Other",
@@ -96,7 +97,7 @@ export default async function handler(req, res) {
   "searchQuery": "best eBay search query for comparable sold listings"
 }`,
             },
-            { type: 'image_url', image_url: { url: imageUrl, detail: 'high' } },
+            ...images.map(url => ({ type: 'image_url', image_url: { url, detail: 'high' } })),
           ],
         },
       ],

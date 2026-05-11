@@ -33,19 +33,21 @@ const CATEGORY_TAGS = ['Pottery', 'Jewelry', 'Furniture', 'Silverware', 'Coins',
 export default function Scan() {
   const { data: session, status: sessionStatus } = useSession()
 
-  const [selectedFile, setSelectedFile] = useState(null)
-  const [previewUrl,   setPreviewUrl]   = useState(null)
-  const [isLoading,    setIsLoading]    = useState(false)
-  const [loadingMsg,   setLoadingMsg]   = useState(LOADING_MESSAGES[0])
-  const [result,       setResult]       = useState(null)
-  const [error,        setError]        = useState(null)
-  const [showAuth,     setShowAuth]     = useState(false)
-  const [showPaywall,  setShowPaywall]  = useState(false)
-  const [paywallMode,  setPaywallMode]  = useState('subscribe')
-  const [paywallData,  setPaywallData]  = useState({})
-  const [saveStatus,   setSaveStatus]   = useState('idle')
-  const [billing,      setBilling]      = useState(null)
-  const [pendingScan,  setPendingScan]  = useState(false)
+  const [selectedFiles, setSelectedFiles] = useState([])   // array of File
+  const [previewUrls,   setPreviewUrls]   = useState([])   // array of object URLs
+  const [isLoading,     setIsLoading]     = useState(false)
+  const [loadingMsg,    setLoadingMsg]    = useState(LOADING_MESSAGES[0])
+  const [result,        setResult]        = useState(null)
+  const [error,         setError]         = useState(null)
+  const [showAuth,      setShowAuth]      = useState(false)
+  const [showPaywall,   setShowPaywall]   = useState(false)
+  const [paywallMode,   setPaywallMode]   = useState('subscribe')
+  const [paywallData,   setPaywallData]   = useState({})
+  const [saveStatus,    setSaveStatus]    = useState('idle')
+  const [billing,       setBilling]       = useState(null)
+  const [pendingScan,   setPendingScan]   = useState(false)
+
+  const MAX_PHOTOS = 4
 
   const loadingIntervalRef = useRef(null)
 
@@ -56,7 +58,7 @@ export default function Scan() {
 
   // Auto-trigger scan once user signs in (after attempting to scan unauthenticated)
   useEffect(() => {
-    if (pendingScan && session && selectedFile) {
+    if (pendingScan && session && selectedFiles.length) {
       setPendingScan(false)
       setShowAuth(false)
       handleScan()
@@ -77,40 +79,51 @@ export default function Scan() {
     return () => clearInterval(loadingIntervalRef.current)
   }, [isLoading])
 
-  function handleFileSelect(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setSelectedFile(file)
-    setPreviewUrl(URL.createObjectURL(file))
+  function addFiles(incoming) {
+    const valid = Array.from(incoming).filter(f => f.type.startsWith('image/'))
+    if (!valid.length) return
+    setSelectedFiles(prev => {
+      const combined = [...prev, ...valid].slice(0, MAX_PHOTOS)
+      setPreviewUrls(combined.map(f => URL.createObjectURL(f)))
+      return combined
+    })
     setResult(null)
     setError(null)
     setSaveStatus('idle')
   }
 
+  function handleFileSelect(e) {
+    if (e.target.files?.length) addFiles(e.target.files)
+    e.target.value = ''   // reset so same file can be re-added after remove
+  }
+
   function handleDrop(e) {
     e.preventDefault()
-    const file = e.dataTransfer.files?.[0]
-    if (!file) return
-    if (!file.type.startsWith('image/')) {
-      setError('Please drop an image file.')
-      return
-    }
-    setSelectedFile(file)
-    setPreviewUrl(URL.createObjectURL(file))
-    setResult(null)
-    setError(null)
+    const files = e.dataTransfer.files
+    if (!files?.length) return
+    const hasNonImage = Array.from(files).some(f => !f.type.startsWith('image/'))
+    if (hasNonImage) { setError('Please drop image files only.'); return }
+    addFiles(files)
+  }
+
+  function removePhoto(idx) {
+    setSelectedFiles(prev => {
+      const next = prev.filter((_, i) => i !== idx)
+      setPreviewUrls(next.map(f => URL.createObjectURL(f)))
+      return next
+    })
   }
 
   function reset() {
-    setSelectedFile(null)
-    setPreviewUrl(null)
+    setSelectedFiles([])
+    setPreviewUrls([])
     setResult(null)
     setError(null)
     setSaveStatus('idle')
   }
 
   async function handleScan() {
-    if (!selectedFile) return
+    if (!selectedFiles.length) return
 
     // Step 1: must be signed in
     if (!session) {
@@ -123,17 +136,18 @@ export default function Scan() {
     setError(null)
 
     try {
-      const imageData = await new Promise((resolve, reject) => {
+      const readFile = file => new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = e => resolve(e.target.result)
         reader.onerror = reject
-        reader.readAsDataURL(selectedFile)
+        reader.readAsDataURL(file)
       })
+      const imageUrls = await Promise.all(selectedFiles.map(readFile))
 
       const res = await fetch('/api/identify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: imageData }),
+        body: JSON.stringify({ imageUrls }),
       })
 
       const data = await res.json()
@@ -187,11 +201,12 @@ export default function Scan() {
       setShowAuth(true)
       return
     }
-    if (!result || !selectedFile) return
+    if (!result || !selectedFiles.length) return
 
     setSaveStatus('saving')
     try {
-      const blob = await upload(selectedFile.name, selectedFile, {
+      const primaryFile = selectedFiles[0]
+      const blob = await upload(primaryFile.name, primaryFile, {
         access: 'public',
         handleUploadUrl: '/api/upload-token',
       })
@@ -220,6 +235,8 @@ export default function Scan() {
   const valueRange = result?.estimatedValueLow != null && result?.estimatedValueHigh != null
     ? `$${result.estimatedValueLow.toLocaleString()} – $${result.estimatedValueHigh.toLocaleString()}`
     : null
+  const hasFiles = selectedFiles.length > 0
+  const canAddMore = selectedFiles.length < MAX_PHOTOS
 
   return (
     <>
@@ -281,61 +298,94 @@ export default function Scan() {
             </div>
           )}
 
-          {!result && !isLoading && !selectedFile && (
+          {!result && !isLoading && (
             <div className={styles.scanZone}>
-              <div
-                className={styles.dropzone}
-                onDrop={handleDrop}
-                onDragOver={e => e.preventDefault()}
-              >
-                <div className={styles.scanBtnWrap}>
-                  <div className={styles.scanBtn}>
-                    <svg width="32" height="32" viewBox="0 0 24 24"
-                      fill="none" stroke="#1A1610" strokeWidth="2">
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                      <circle cx="12" cy="13" r="4"/>
-                    </svg>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      onChange={handleFileSelect}
-                      className={styles.fileInput}
-                      aria-label="Take a photo or upload an image"
-                    />
+              {!hasFiles && (
+                <div
+                  className={styles.dropzone}
+                  onDrop={handleDrop}
+                  onDragOver={e => e.preventDefault()}
+                >
+                  <div className={styles.scanBtnWrap}>
+                    <div className={styles.scanBtn}>
+                      <svg width="28" height="28" viewBox="0 0 24 24"
+                        fill="none" stroke="#1A1610" strokeWidth="2">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                        <circle cx="12" cy="13" r="4"/>
+                      </svg>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleFileSelect}
+                        className={styles.fileInput}
+                        aria-label="Upload photos"
+                      />
+                    </div>
+                    <p className={styles.scanBtnLabel}>Tap to add photos</p>
                   </div>
-                  <p className={styles.scanBtnLabel}>Tap to take photo</p>
+                  <p className={styles.multiHint}>
+                    Add up to 4 photos for a more accurate result —<br />
+                    try the item, the base, and any maker&apos;s marks
+                  </p>
+                  <div className={styles.orDivider}><span>or drag &amp; drop</span></div>
+                  <p className={styles.dropzoneHint}>JPG, PNG, WEBP · Up to 4 photos</p>
                 </div>
+              )}
 
-                <div className={styles.orDivider}>
-                  <span>or drag &amp; drop</span>
+              {hasFiles && (
+                <div className={styles.previewZone}>
+                  <div className={styles.thumbGrid}>
+                    {previewUrls.map((url, idx) => (
+                      <div key={idx} className={styles.thumbWrap}>
+                        <img src={url} alt={`Photo ${idx + 1}`} className={styles.thumbImg} />
+                        <button
+                          className={styles.thumbRemove}
+                          onClick={() => removePhoto(idx)}
+                          aria-label={`Remove photo ${idx + 1}`}
+                        >×</button>
+                        {idx === 0 && <span className={styles.thumbPrimary}>Main</span>}
+                      </div>
+                    ))}
+                    {canAddMore && (
+                      <label className={styles.thumbAdd}>
+                        <svg width="22" height="22" viewBox="0 0 24 24"
+                          fill="none" stroke="#5A4F3F" strokeWidth="2">
+                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                          <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        <span>Add photo</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleFileSelect}
+                          className={styles.fileInput}
+                        />
+                      </label>
+                    )}
+                  </div>
+
+                  <p className={styles.photoCount}>
+                    {selectedFiles.length} of {MAX_PHOTOS} photos · more angles = better accuracy
+                  </p>
+
+                  <button className={styles.identifyBtn} onClick={handleScan}>
+                    Identify from {selectedFiles.length} {selectedFiles.length === 1 ? 'photo' : 'photos'} →
+                  </button>
+                  <button className={styles.resetLink} onClick={reset}>
+                    Start over
+                  </button>
                 </div>
+              )}
 
-                <p className={styles.dropzoneHint}>JPG, PNG, WEBP · Max 10MB</p>
-              </div>
-
-              <div className={styles.categories}>
-                {CATEGORY_TAGS.map(c => (
-                  <span key={c} className={styles.catChip}>{c}</span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {selectedFile && !result && !isLoading && (
-            <div className={styles.previewZone}>
-              <img
-                src={previewUrl}
-                alt="Selected antique"
-                className={styles.previewImg}
-              />
-              <p className={styles.previewName}>{selectedFile.name}</p>
-              <button className={styles.identifyBtn} onClick={handleScan}>
-                Identify this antique →
-              </button>
-              <button className={styles.resetLink} onClick={reset}>
-                Choose a different photo
-              </button>
+              {!hasFiles && (
+                <div className={styles.categories}>
+                  {CATEGORY_TAGS.map(c => (
+                    <span key={c} className={styles.catChip}>{c}</span>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -345,10 +395,10 @@ export default function Scan() {
             <div className={styles.results}>
 
               <div className={styles.resultHeader}>
-                {previewUrl && (
+                {previewUrls[0] && (
                   <div className={styles.resultThumbWrap}>
                     <img
-                      src={previewUrl}
+                      src={previewUrls[0]}
                       alt={result.itemName}
                       className={styles.resultThumb}
                     />
@@ -470,7 +520,7 @@ export default function Scan() {
             </div>
           )}
 
-          {!result && !selectedFile && !isLoading && (
+          {!result && !hasFiles && !isLoading && (
             <div className={styles.featureGrid} style={{ marginTop: 16 }}>
               <Link href="/helper" className={styles.featureTile}>
                 <div className={styles.featureIcon}>💬</div>
