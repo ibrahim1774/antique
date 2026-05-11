@@ -88,7 +88,7 @@ export default async function handler(req, res) {
   "historicalContext": "2–3 sentences about this type of piece, its maker, and historical significance",
   "makersMarkDescription": "describe any visible marks, signatures, hallmarks, stamps — or null",
   "materials": "e.g. glazed earthenware, sterling silver, oak with brass fittings",
-  "condition": "Excellent" or "Very Good" or "Good" or "Fair" or "Poor",
+  "condition": "Mint" or "Near Mint" or "Excellent" or "Very Fine" or "Fine" or "Very Good" or "Good" or "Fair" or "Poor",
   "estimatedValueLow": <integer USD>,
   "estimatedValueHigh": <integer USD>,
   "valueNotes": "1 sentence on what drives the range (rarity, demand, condition)",
