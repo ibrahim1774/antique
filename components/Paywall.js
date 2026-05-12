@@ -2,7 +2,7 @@ import { useState } from 'react'
 import styles from '../styles/Paywall.module.css'
 
 const MONTHLY_BENEFITS = [
-  { icon: '🔍', text: '30 credits to start your search each month' },
+  { icon: '🔍', text: '30 scans to start — refreshes every month' },
   { icon: '➕', text: 'Need more? Top up anytime — 50 scans for $5' },
   { icon: '🏺', text: 'AI identification from any photo or angle' },
   { icon: '✓',  text: 'Get help identifying real or fake items' },
