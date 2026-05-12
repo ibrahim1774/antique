@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 export default function BillingSuccess() {
   const router = useRouter()
   const [status, setStatus] = useState(null)
+  const [countdown, setCountdown] = useState(3)
 
   useEffect(() => {
     let cancelled = false
@@ -28,6 +29,22 @@ export default function BillingSuccess() {
     poll()
     return () => { cancelled = true }
   }, [])
+
+  // Auto-redirect to scan page once subscription is confirmed
+  useEffect(() => {
+    if (!status || status.pending) return
+    const interval = setInterval(() => {
+      setCountdown(c => {
+        if (c <= 1) {
+          clearInterval(interval)
+          router.push('/scan')
+          return 0
+        }
+        return c - 1
+      })
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [status, router])
 
   const isTopup = router.query.type === 'topup'
 
@@ -73,7 +90,7 @@ export default function BillingSuccess() {
           textDecoration: 'none',
           fontWeight: 500,
         }}>
-          Start scanning →
+          {status && !status.pending ? `Start scanning → (${countdown})` : 'Start scanning →'}
         </Link>
       </div>
     </>

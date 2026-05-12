@@ -20,6 +20,8 @@
   padding: 28px 22px 24px;
   box-shadow: 0 -20px 60px rgba(0,0,0,0.4);
   animation: slideUp 0.3s ease-out;
+  overflow-y: auto;
+  max-height: calc(100svh - 40px);
 }
 
 @media (min-width: 600px) {
@@ -83,6 +85,7 @@
   display: grid;
   gap: 10px;
   margin-bottom: 12px;
+  padding-top: 14px;
 }
 
 .planCard {

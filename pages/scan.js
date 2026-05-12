@@ -33,19 +33,20 @@ const CATEGORY_TAGS = ['Pottery', 'Jewelry', 'Furniture', 'Silverware', 'Coins',
 export default function Scan() {
   const { data: session, status: sessionStatus } = useSession()
 
-  const [selectedFiles, setSelectedFiles] = useState([])   // array of File
-  const [previewUrls,   setPreviewUrls]   = useState([])   // array of object URLs
-  const [isLoading,     setIsLoading]     = useState(false)
-  const [loadingMsg,    setLoadingMsg]    = useState(LOADING_MESSAGES[0])
-  const [result,        setResult]        = useState(null)
-  const [error,         setError]         = useState(null)
-  const [showAuth,      setShowAuth]      = useState(false)
-  const [showPaywall,   setShowPaywall]   = useState(false)
-  const [paywallMode,   setPaywallMode]   = useState('subscribe')
-  const [paywallData,   setPaywallData]   = useState({})
-  const [saveStatus,    setSaveStatus]    = useState('idle')
-  const [billing,       setBilling]       = useState(null)
-  const [pendingScan,   setPendingScan]   = useState(false)
+  const [selectedFiles,     setSelectedFiles]     = useState([])   // array of File
+  const [previewUrls,       setPreviewUrls]       = useState([])   // array of object/data URLs
+  const [restoredPhotoUrls, setRestoredPhotoUrls] = useState([])   // base64 data URLs from sessionStorage
+  const [isLoading,         setIsLoading]         = useState(false)
+  const [loadingMsg,        setLoadingMsg]        = useState(LOADING_MESSAGES[0])
+  const [result,            setResult]            = useState(null)
+  const [error,             setError]             = useState(null)
+  const [showAuth,          setShowAuth]          = useState(false)
+  const [showPaywall,       setShowPaywall]       = useState(false)
+  const [paywallMode,       setPaywallMode]       = useState('subscribe')
+  const [paywallData,       setPaywallData]       = useState({})
+  const [saveStatus,        setSaveStatus]        = useState('idle')
+  const [billing,           setBilling]           = useState(null)
+  const [pendingScan,       setPendingScan]       = useState(false)
 
   const MAX_PHOTOS = 4
 
@@ -56,15 +57,34 @@ export default function Scan() {
     fetch('/api/billing/status').then(r => r.ok ? r.json() : null).then(setBilling)
   }, [session])
 
+  // Restore photos saved before an auth redirect or Stripe checkout
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const stored = sessionStorage.getItem('tivoro_pending_photos')
+    if (!stored) return
+    try {
+      const urls = JSON.parse(stored)
+      if (Array.isArray(urls) && urls.length) {
+        setRestoredPhotoUrls(urls)
+        setPreviewUrls(urls)
+        if (sessionStorage.getItem('tivoro_pending_scan') === '1') {
+          setPendingScan(true)
+        }
+      }
+    } catch {}
+    sessionStorage.removeItem('tivoro_pending_photos')
+    sessionStorage.removeItem('tivoro_pending_scan')
+  }, [])
+
   // Auto-trigger scan once user signs in (after attempting to scan unauthenticated)
   useEffect(() => {
-    if (pendingScan && session && selectedFiles.length) {
+    if (pendingScan && session && (selectedFiles.length || restoredPhotoUrls.length)) {
       setPendingScan(false)
       setShowAuth(false)
       handleScan()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, pendingScan])
+  }, [session, pendingScan, restoredPhotoUrls.length])
 
   useEffect(() => {
     if (isLoading) {
@@ -82,6 +102,7 @@ export default function Scan() {
   function addFiles(incoming) {
     const valid = Array.from(incoming).filter(f => f.type.startsWith('image/'))
     if (!valid.length) return
+    setRestoredPhotoUrls([])
     setSelectedFiles(prev => {
       const combined = [...prev, ...valid].slice(0, MAX_PHOTOS)
       setPreviewUrls(combined.map(f => URL.createObjectURL(f)))
@@ -107,27 +128,48 @@ export default function Scan() {
   }
 
   function removePhoto(idx) {
-    setSelectedFiles(prev => {
-      const next = prev.filter((_, i) => i !== idx)
-      setPreviewUrls(next.map(f => URL.createObjectURL(f)))
-      return next
-    })
+    if (restoredPhotoUrls.length > 0) {
+      const next = restoredPhotoUrls.filter((_, i) => i !== idx)
+      setRestoredPhotoUrls(next)
+      setPreviewUrls(next)
+    } else {
+      setSelectedFiles(prev => {
+        const next = prev.filter((_, i) => i !== idx)
+        setPreviewUrls(next.map(f => URL.createObjectURL(f)))
+        return next
+      })
+    }
   }
 
   function reset() {
     setSelectedFiles([])
     setPreviewUrls([])
+    setRestoredPhotoUrls([])
     setResult(null)
     setError(null)
     setSaveStatus('idle')
   }
 
   async function handleScan() {
-    if (!selectedFiles.length) return
+    const hasPhotos = selectedFiles.length > 0 || restoredPhotoUrls.length > 0
+    if (!hasPhotos) return
+
+    const readFile = file => new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = e => resolve(e.target.result)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
 
     // Step 1: must be signed in
     if (!session) {
       setPendingScan(true)
+      // Persist photos so they survive the OAuth redirect
+      if (selectedFiles.length) {
+        const base64s = await Promise.all(selectedFiles.map(readFile))
+        sessionStorage.setItem('tivoro_pending_photos', JSON.stringify(base64s))
+      }
+      sessionStorage.setItem('tivoro_pending_scan', '1')
       setShowAuth(true)
       return
     }
@@ -136,13 +178,12 @@ export default function Scan() {
     setError(null)
 
     try {
-      const readFile = file => new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = e => resolve(e.target.result)
-        reader.onerror = reject
-        reader.readAsDataURL(file)
-      })
-      const imageUrls = await Promise.all(selectedFiles.map(readFile))
+      // Use restored base64 URLs if files were loaded from sessionStorage
+      const imageUrls = restoredPhotoUrls.length > 0
+        ? restoredPhotoUrls
+        : await Promise.all(selectedFiles.map(readFile))
+
+      if (restoredPhotoUrls.length > 0) setRestoredPhotoUrls([])
 
       const res = await fetch('/api/identify', {
         method: 'POST',
@@ -154,6 +195,8 @@ export default function Scan() {
 
       if (res.status === 401) {
         setIsLoading(false)
+        sessionStorage.setItem('tivoro_pending_photos', JSON.stringify(imageUrls))
+        sessionStorage.setItem('tivoro_pending_scan', '1')
         setPendingScan(true)
         setShowAuth(true)
         return
@@ -161,6 +204,9 @@ export default function Scan() {
 
       if (res.status === 402) {
         setIsLoading(false)
+        // Persist photos so they survive the Stripe checkout redirect
+        sessionStorage.setItem('tivoro_pending_photos', JSON.stringify(imageUrls))
+        sessionStorage.setItem('tivoro_pending_scan', '1')
         setPaywallMode(data.hasSubscription ? 'topup' : 'subscribe')
         setPaywallData({
           monthlyUsed: data.monthlyUsed,
@@ -235,8 +281,9 @@ export default function Scan() {
   const valueRange = result?.estimatedValueLow != null && result?.estimatedValueHigh != null
     ? `$${result.estimatedValueLow.toLocaleString()} – $${result.estimatedValueHigh.toLocaleString()}`
     : null
-  const hasFiles = selectedFiles.length > 0
-  const canAddMore = selectedFiles.length < MAX_PHOTOS
+  const effectivePhotoCount = selectedFiles.length || restoredPhotoUrls.length
+  const hasFiles = effectivePhotoCount > 0
+  const canAddMore = selectedFiles.length < MAX_PHOTOS && restoredPhotoUrls.length === 0
 
   return (
     <>
@@ -367,11 +414,11 @@ export default function Scan() {
                   </div>
 
                   <p className={styles.photoCount}>
-                    {selectedFiles.length} of {MAX_PHOTOS} photos · more angles = better accuracy
+                    {effectivePhotoCount} of {MAX_PHOTOS} photos · more angles = better accuracy
                   </p>
 
                   <button className={styles.identifyBtn} onClick={handleScan}>
-                    Identify from {selectedFiles.length} {selectedFiles.length === 1 ? 'photo' : 'photos'} →
+                    Identify from {effectivePhotoCount} {effectivePhotoCount === 1 ? 'photo' : 'photos'} →
                   </button>
                   <button className={styles.resetLink} onClick={reset}>
                     Start over

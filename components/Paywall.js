@@ -1,17 +1,26 @@
 import { useState } from 'react'
 import styles from '../styles/Paywall.module.css'
 
-const SHARED_BENEFITS = [
-  { icon: '🔍', text: '30 scans per month to get started' },
+const MONTHLY_BENEFITS = [
+  { icon: '🔍', text: '30 credits to start your search each month' },
   { icon: '➕', text: 'Need more? Top up anytime — 50 scans for $5' },
   { icon: '🏺', text: 'AI identification from any photo or angle' },
-  { icon: '✓',  text: 'Real vs Fake authenticity detection' },
-  { icon: '💰', text: 'Market value range with comparable listings' },
+  { icon: '✓',  text: 'Get help identifying real or fake items' },
+  { icon: '💰', text: 'Potential market value with comparable listings' },
   { icon: '📁', text: 'Save & organize your full collection' },
-  { icon: '💬', text: 'AI antique expert chat, any question' },
+  { icon: '💬', text: 'AI antique expert chat' },
 ]
 
-const YEARLY_EXTRA = { icon: '💛', text: 'Save 35% vs monthly — best value for collectors' }
+const YEARLY_BENEFITS = [
+  { icon: '💛', text: 'Save 35% vs monthly — best value for collectors' },
+  { icon: '🔍', text: '360 credits total across the year (30/mo)' },
+  { icon: '➕', text: 'Need more? Top up anytime — 50 scans for $5' },
+  { icon: '🏺', text: 'AI identification from any photo or angle' },
+  { icon: '✓',  text: 'Get help identifying real or fake items' },
+  { icon: '💰', text: 'Potential market value with comparable listings' },
+  { icon: '📁', text: 'Save & organize your full collection' },
+  { icon: '💬', text: 'AI antique expert chat' },
+]
 
 const CARD_DISCLAIMER = '* AI-powered analysis — a helpful starting point, not a certified appraisal.'
 
@@ -83,10 +92,7 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
                 <span className={styles.planEquiv}>≈ $3.25/mo</span>
               </div>
               <ul className={styles.benefitList}>
-                <li key={YEARLY_EXTRA.text}>
-                  <span className={styles.bulletIcon}>{YEARLY_EXTRA.icon}</span>{YEARLY_EXTRA.text}
-                </li>
-                {SHARED_BENEFITS.map(b => (
+                {YEARLY_BENEFITS.map(b => (
                   <li key={b.text}>
                     <span className={styles.bulletIcon}>{b.icon}</span>{b.text}
                   </li>
@@ -111,7 +117,7 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
                 <span className={styles.planCadence}>/month</span>
               </div>
               <ul className={styles.benefitList}>
-                {SHARED_BENEFITS.map(b => (
+                {MONTHLY_BENEFITS.map(b => (
                   <li key={b.text}>
                     <span className={styles.bulletIcon}>{b.icon}</span>{b.text}
                   </li>
