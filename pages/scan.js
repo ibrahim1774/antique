@@ -30,6 +30,29 @@ const AUTH_CONFIG = {
 
 const CATEGORY_TAGS = ['Pottery', 'Jewelry', 'Furniture', 'Silverware', 'Coins', 'Art', 'Watches', 'Glass']
 
+async function compressImage(file, maxDim = 1600, quality = 0.85) {
+  const dataUrl = await new Promise((resolve, reject) => {
+    const r = new FileReader()
+    r.onload = () => resolve(r.result)
+    r.onerror = reject
+    r.readAsDataURL(file)
+  })
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image()
+    i.onload = () => resolve(i)
+    i.onerror = reject
+    i.src = dataUrl
+  })
+  const scale = Math.min(1, maxDim / Math.max(img.width, img.height))
+  const w = Math.max(1, Math.round(img.width * scale))
+  const h = Math.max(1, Math.round(img.height * scale))
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = h
+  canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+  return canvas.toDataURL('image/jpeg', quality)
+}
+
 export default function Scan() {
   const { data: session, status: sessionStatus } = useSession()
 
@@ -154,20 +177,15 @@ export default function Scan() {
     const hasPhotos = selectedFiles.length > 0 || restoredPhotoUrls.length > 0
     if (!hasPhotos) return
 
-    const readFile = file => new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = e => resolve(e.target.result)
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
-
     // Step 1: must be signed in
     if (!session) {
       setPendingScan(true)
-      // Persist photos so they survive the OAuth redirect
+      // Persist compressed photos so they survive the OAuth redirect
       if (selectedFiles.length) {
-        const base64s = await Promise.all(selectedFiles.map(readFile))
-        sessionStorage.setItem('tivoro_pending_photos', JSON.stringify(base64s))
+        const base64s = await Promise.all(selectedFiles.map(f => compressImage(f)))
+        try {
+          sessionStorage.setItem('tivoro_pending_photos', JSON.stringify(base64s))
+        } catch {}
       }
       sessionStorage.setItem('tivoro_pending_scan', '1')
       setShowAuth(true)
@@ -181,7 +199,7 @@ export default function Scan() {
       // Use restored base64 URLs if files were loaded from sessionStorage
       const imageUrls = restoredPhotoUrls.length > 0
         ? restoredPhotoUrls
-        : await Promise.all(selectedFiles.map(readFile))
+        : await Promise.all(selectedFiles.map(f => compressImage(f)))
 
       if (restoredPhotoUrls.length > 0) setRestoredPhotoUrls([])
 
@@ -191,7 +209,11 @@ export default function Scan() {
         body: JSON.stringify({ imageUrls }),
       })
 
-      const data = await res.json()
+      // Surface platform-level errors (413, 504, etc.) that return non-JSON
+      const ctype = res.headers.get('content-type') || ''
+      const data = ctype.includes('application/json')
+        ? await res.json()
+        : { error: `Server returned ${res.status}. Photos may be too large — try fewer or smaller images.` }
 
       if (res.status === 401) {
         setIsLoading(false)
@@ -235,8 +257,8 @@ export default function Scan() {
         })
       }
     } catch (err) {
-      setError('Something went wrong. Please check your connection and try again.')
-      console.error(err)
+      console.error('[scan]', err)
+      setError(`Something went wrong: ${err.message || err}. Please try again.`)
     } finally {
       setIsLoading(false)
     }
