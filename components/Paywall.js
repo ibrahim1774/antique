@@ -2,29 +2,31 @@ import { useState } from 'react'
 import styles from '../styles/Paywall.module.css'
 
 const MONTHLY_BENEFITS = [
-  { icon: '🔍', text: '300 credits to start — refreshes every month' },
-  { icon: '🪙', text: 'Each scan uses 10 credits (~30 scans/month)' },
-  { icon: '➕', text: 'Need more? Top up anytime — 50 scans for $5' },
-  { icon: '🏺', text: 'AI identification from any photo or angle' },
-  { icon: '✓',  text: 'Get help identifying real or fake items' },
-  { icon: '💰', text: 'Potential market value with comparable listings' },
-  { icon: '📁', text: 'Save & organize your full collection' },
-  { icon: '💬', text: 'AI antique expert chat' },
+  { icon: '🔍', text: '300 credits/month — refreshes monthly' },
+  { icon: '🪙', text: 'Each scan = 10 credits (~30 scans/mo)' },
+  { icon: '➕', text: 'Top up anytime — 50 scans for $5' },
+  { icon: '🏺', text: 'AI identification + market value' },
+  { icon: '💬', text: 'AI antique expert chat + collection' },
+]
+
+const PLUS_BENEFITS = [
+  { icon: '🎁', text: '600 credits + 300 BONUS = 900 credits/month', highlight: true },
+  { icon: '🪙', text: 'Each scan = 10 credits (~90 scans/mo)' },
+  { icon: '➕', text: 'Top up anytime — 50 scans for $5' },
+  { icon: '🏺', text: 'AI identification + market value' },
+  { icon: '💬', text: 'AI antique expert chat + collection' },
 ]
 
 const YEARLY_BENEFITS = [
-  { icon: '💛', text: 'Save 50% vs monthly — best value for collectors' },
-  { icon: '🔍', text: '3,600 credits total per year (300/month)' },
-  { icon: '🪙', text: 'Each scan uses 10 credits (~360 scans/year)' },
-  { icon: '➕', text: 'Need more? Top up anytime — 50 scans for $5' },
-  { icon: '🏺', text: 'AI identification from any photo or angle' },
-  { icon: '✓',  text: 'Get help identifying real or fake items' },
-  { icon: '💰', text: 'Potential market value with comparable listings' },
-  { icon: '📁', text: 'Save & organize your full collection' },
-  { icon: '💬', text: 'AI antique expert chat' },
+  { icon: '💛', text: 'Save 50% vs monthly — best value' },
+  { icon: '🔍', text: '3,600 credits/year (300/month)' },
+  { icon: '🪙', text: 'Each scan = 10 credits (~360 scans/yr)' },
+  { icon: '➕', text: 'Top up anytime — 50 scans for $5' },
+  { icon: '🏺', text: 'AI identification + market value' },
+  { icon: '💬', text: 'AI antique expert chat + collection' },
 ]
 
-const CARD_DISCLAIMER = '* AI-powered analysis — a helpful starting point, not a certified appraisal.'
+const CARD_DISCLAIMER = '* AI-powered — a research starting point, not a certified appraisal.'
 
 export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
   const [loading, setLoading] = useState(null)
@@ -55,6 +57,18 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
   const showTopup = mode === 'topup' || mode === 'both'
   const showSub   = mode === 'subscribe' || mode === 'both'
 
+  function renderBenefits(items) {
+    return (
+      <ul className={styles.benefitList}>
+        {items.map(b => (
+          <li key={b.text} className={b.highlight ? styles.benefitHighlight : undefined}>
+            <span className={styles.bulletIcon}>{b.icon}</span>{b.text}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
@@ -65,19 +79,56 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
         </div>
 
         <h2 className={styles.title}>
-          {mode === 'topup'
-            ? 'Out of scans'
-            : 'Choose your plan'}
+          {mode === 'topup' ? 'Out of scans' : 'Choose your plan'}
         </h2>
 
         <p className={styles.subtitle}>
           {mode === 'topup'
             ? 'Top up your scans or upgrade to keep researching your pieces.'
-            : 'Identify any antique. Get market value. Spot fakes. Build your collection.'}
+            : 'Identify any antique. Get market value. Spot fakes.'}
         </p>
 
         {showSub && (
           <div className={styles.plansGrid}>
+            <button
+              className={styles.planCard}
+              onClick={() => startCheckout('/api/checkout/subscribe', { plan: 'monthly' })}
+              disabled={loading !== null}
+            >
+              <div className={styles.planHeader}>
+                <div className={styles.planLabel}>Monthly</div>
+              </div>
+              <div className={styles.planPriceRow}>
+                <span className={styles.planPrice}>$5</span>
+                <span className={styles.planCadence}>/month</span>
+              </div>
+              {renderBenefits(MONTHLY_BENEFITS)}
+              <div className={styles.planCta}>
+                {loading === 'monthly' ? 'Loading…' : 'Choose Monthly'}
+              </div>
+            </button>
+
+            <button
+              className={`${styles.planCard} ${styles.planPlus}`}
+              onClick={() => startCheckout('/api/checkout/subscribe', { plan: 'monthly_plus' })}
+              disabled={loading !== null}
+            >
+              <div className={styles.bonusBadge}>+300 BONUS CREDITS</div>
+              <div className={styles.planHeader}>
+                <div className={styles.planLabel}>Monthly Plus</div>
+                <div className={styles.bestPick}>Most credits</div>
+              </div>
+              <div className={styles.planPriceRow}>
+                <span className={styles.planPrice}>$9</span>
+                <span className={styles.planCadence}>/month</span>
+                <span className={styles.planEquiv}>~$0.10/scan</span>
+              </div>
+              {renderBenefits(PLUS_BENEFITS)}
+              <div className={styles.planCta}>
+                {loading === 'monthly_plus' ? 'Loading…' : 'Choose Monthly Plus'}
+              </div>
+            </button>
+
             <button
               className={`${styles.planCard} ${styles.planYearly}`}
               onClick={() => startCheckout('/api/checkout/subscribe', { plan: 'yearly' })}
@@ -93,43 +144,13 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
                 <span className={styles.planCadence}>/year</span>
                 <span className={styles.planEquiv}>≈ $2.42/mo</span>
               </div>
-              <ul className={styles.benefitList}>
-                {YEARLY_BENEFITS.map(b => (
-                  <li key={b.text}>
-                    <span className={styles.bulletIcon}>{b.icon}</span>{b.text}
-                  </li>
-                ))}
-              </ul>
+              {renderBenefits(YEARLY_BENEFITS)}
               <div className={styles.planCta}>
                 {loading === 'yearly' ? 'Loading…' : 'Choose Yearly'}
               </div>
-              <p className={styles.cardDisclaimer}>{CARD_DISCLAIMER}</p>
             </button>
 
-            <button
-              className={styles.planCard}
-              onClick={() => startCheckout('/api/checkout/subscribe', { plan: 'monthly' })}
-              disabled={loading !== null}
-            >
-              <div className={styles.planHeader}>
-                <div className={styles.planLabel}>Monthly</div>
-              </div>
-              <div className={styles.planPriceRow}>
-                <span className={styles.planPrice}>$5</span>
-                <span className={styles.planCadence}>/month</span>
-              </div>
-              <ul className={styles.benefitList}>
-                {MONTHLY_BENEFITS.map(b => (
-                  <li key={b.text}>
-                    <span className={styles.bulletIcon}>{b.icon}</span>{b.text}
-                  </li>
-                ))}
-              </ul>
-              <div className={styles.planCta}>
-                {loading === 'monthly' ? 'Loading…' : 'Choose Monthly'}
-              </div>
-              <p className={styles.cardDisclaimer}>{CARD_DISCLAIMER}</p>
-            </button>
+            <p className={styles.cardDisclaimer}>{CARD_DISCLAIMER}</p>
           </div>
         )}
 
@@ -151,7 +172,7 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
         )}
 
         <p className={styles.legal}>
-          Cancel anytime. Secure checkout via Stripe. Tivoro provides research starting points — not formal appraisals.
+          Cancel anytime · Secure Stripe checkout · Research tool, not formal appraisals.
         </p>
       </div>
     </div>

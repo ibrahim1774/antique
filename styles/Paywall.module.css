@@ -8,7 +8,7 @@
 }
 
 @media (min-width: 600px) {
-  .overlay { align-items: center; padding: 24px; }
+  .overlay { align-items: center; padding: 20px; }
 }
 
 .modal {
@@ -16,8 +16,8 @@
   width: 100%;
   max-width: 460px;
   background: #FBF6EC;
-  border-radius: 20px 20px 0 0;
-  padding: 28px 22px 24px;
+  border-radius: 18px 18px 0 0;
+  padding: 20px 18px 18px;
   box-shadow: 0 -20px 60px rgba(0,0,0,0.4);
   animation: slideUp 0.3s ease-out;
   overflow-y: auto;
@@ -25,7 +25,7 @@
 }
 
 @media (min-width: 600px) {
-  .modal { border-radius: 20px; }
+  .modal { border-radius: 18px; }
 }
 
 @keyframes slideUp {
@@ -35,57 +35,47 @@
 
 .closeBtn {
   position: absolute;
-  top: 12px; right: 14px;
-  width: 32px; height: 32px;
+  top: 10px; right: 12px;
+  width: 30px; height: 30px;
   border-radius: 50%;
   background: rgba(26,22,16,0.06);
   border: none;
-  font-size: 22px;
+  font-size: 20px;
   color: #1A1610;
   cursor: pointer;
   line-height: 1;
+  z-index: 2;
 }
 
-.brandRow { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.brandRow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .logo {
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 20px;
+  font-size: 18px;
   color: #1A1610;
   letter-spacing: -0.01em;
 }
 
 .title {
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 26px;
+  font-size: 22px;
   line-height: 1.18;
   color: #1A1610;
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   letter-spacing: -0.01em;
 }
 
 .subtitle {
-  font-size: 14px;
-  color: #5A4F3F;
-  margin: 0 0 18px;
-  line-height: 1.5;
-}
-
-.usageStrip {
-  background: rgba(200, 146, 31, 0.12);
-  color: #8A6614;
-  border-radius: 8px;
-  padding: 8px 12px;
   font-size: 13px;
-  margin-bottom: 14px;
-  text-align: center;
-  font-weight: 500;
+  color: #5A4F3F;
+  margin: 0 0 12px;
+  line-height: 1.45;
 }
 
 .plansGrid {
   display: grid;
   gap: 10px;
-  margin-bottom: 12px;
-  padding-top: 14px;
+  margin-bottom: 8px;
+  padding-top: 12px;
 }
 
 .planCard {
@@ -93,8 +83,8 @@
   text-align: left;
   background: #fff;
   border: 1.5px solid rgba(26,22,16,0.1);
-  border-radius: 14px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 12px 14px;
   cursor: pointer;
   transition: all 0.15s;
   font-family: inherit;
@@ -102,31 +92,41 @@
 .planCard:hover { border-color: #1A1610; transform: translateY(-1px); }
 .planCard:disabled { opacity: 0.6; cursor: wait; }
 
+.planPlus {
+  border-color: #C8921F;
+  background: linear-gradient(180deg, #FFF7E6 0%, #fff 100%);
+  box-shadow: 0 2px 12px rgba(200,146,31,0.15);
+}
+
 .planYearly {
   border-color: #1A1610;
   background: linear-gradient(180deg, #FFFAF0 0%, #fff 100%);
 }
 
-.bestValueBadge {
+.bonusBadge {
   position: absolute;
-  top: -10px; right: 12px;
-  background: #1A1610;
-  color: #FBF6EC;
+  top: -10px; left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: linear-gradient(135deg, #C8921F 0%, #E0A82A 100%);
+  color: #fff;
   font-size: 11px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  box-shadow: 0 4px 12px rgba(200, 146, 31, 0.4);
+  border: 2px solid #FBF6EC;
 }
 
 .discountBadge {
   position: absolute;
-  top: -12px; right: 12px;
+  top: -10px; right: 12px;
   background: linear-gradient(135deg, #C8921F 0%, #E0A82A 100%);
   color: #fff;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 999px;
   letter-spacing: 0.06em;
   box-shadow: 0 4px 12px rgba(200, 146, 31, 0.4);
@@ -135,14 +135,14 @@
 
 .planHeader {
   display: flex; align-items: center; gap: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .bestPick {
-  font-size: 10px;
+  font-size: 9px;
   background: rgba(200, 146, 31, 0.18);
   color: #8A6614;
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -150,88 +150,76 @@
 }
 
 .planEquiv {
-  font-size: 12px;
+  font-size: 11px;
   color: #8A8070;
-  margin-left: 6px;
+  margin-left: 4px;
 }
 
 .cardDisclaimer {
   font-size: 10px;
   color: #8A8070;
-  margin: 10px 0 0;
+  margin: 6px 0 0;
   line-height: 1.4;
   text-align: center;
 }
 
 .bulletIcon {
   flex-shrink: 0;
-  width: 18px;
+  width: 16px;
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   margin-top: 1px;
 }
 
 .benefitList {
   list-style: none;
   padding: 0;
-  margin: 12px 0;
-  font-size: 13px;
+  margin: 8px 0 10px;
+  font-size: 12.5px;
   color: #3A3328;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 .benefitList li {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 7px;
+  margin-bottom: 4px;
 }
-.check {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: rgba(107, 175, 122, 0.18);
-  color: #4A7B56;
-  font-size: 11px;
-  font-weight: 700;
-  margin-top: 1px;
+
+.benefitHighlight {
+  background: linear-gradient(90deg, rgba(200,146,31,0.18) 0%, rgba(200,146,31,0.04) 100%);
+  border-radius: 6px;
+  padding: 4px 6px;
+  margin-left: -6px;
+  font-weight: 600;
+  color: #8A6614;
 }
 
 .planLabel {
-  font-size: 13px;
+  font-size: 12px;
   color: #5A4F3F;
-  margin-bottom: 4px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
 }
 
-.planPriceRow { display: flex; align-items: baseline; gap: 4px; }
+.planPriceRow { display: flex; align-items: baseline; gap: 4px; margin-top: 2px; }
 .planPrice {
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 32px;
+  font-size: 26px;
   color: #1A1610;
   font-weight: 600;
 }
-.planCadence { color: #8A8070; font-size: 14px; }
-
-.planSub {
-  font-size: 13px;
-  color: #5A4F3F;
-  margin: 4px 0 12px;
-}
+.planCadence { color: #8A8070; font-size: 13px; }
 
 .planCta {
   background: #1A1610;
   color: #FBF6EC;
   text-align: center;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 9px;
+  border-radius: 9px;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .topupCard {
@@ -240,37 +228,37 @@
   background: #fff;
   border: 1px dashed rgba(26,22,16,0.25);
   border-radius: 12px;
-  padding: 14px 16px;
-  margin-top: 8px;
+  padding: 12px 14px;
+  margin-top: 6px;
   cursor: pointer;
   font-family: inherit;
 }
 .topupCard:disabled { opacity: 0.6; cursor: wait; }
 
 .topupLabel {
-  font-size: 12px;
+  font-size: 11px;
   color: #5A4F3F;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
-.topupRow { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
-.topupPrice { font-family: 'Fraunces', Georgia, serif; font-size: 22px; color: #1A1610; }
-.topupDetail { font-size: 14px; color: #5A4F3F; }
+.topupRow { display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px; }
+.topupPrice { font-family: 'Fraunces', Georgia, serif; font-size: 20px; color: #1A1610; }
+.topupDetail { font-size: 13px; color: #5A4F3F; }
 .topupCta {
   background: rgba(26,22,16,0.08);
   color: #1A1610;
   text-align: center;
-  padding: 8px;
+  padding: 7px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
 }
 
 .legal {
-  font-size: 11px;
+  font-size: 10px;
   color: #8A8070;
   text-align: center;
-  margin: 14px 0 0;
+  margin: 10px 0 0;
   line-height: 1.5;
 }

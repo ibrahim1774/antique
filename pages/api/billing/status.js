@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
 import { getSupabaseAdmin } from '../../../lib/supabase'
-import { MONTHLY_SCAN_QUOTA } from '../../../lib/stripe'
+import { quotaForPlan } from '../../../lib/stripe'
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
 
@@ -25,14 +25,15 @@ export default async function handler(req, res) {
     monthlyUsed = 0
   }
 
-  const subQuotaLeft = hasActiveSub ? Math.max(0, MONTHLY_SCAN_QUOTA - monthlyUsed) : 0
+  const monthlyQuota = quotaForPlan(user?.subscription_plan)
+  const subQuotaLeft = hasActiveSub ? Math.max(0, monthlyQuota - monthlyUsed) : 0
   const topupLeft = user?.topup_scans || 0
 
   return res.status(200).json({
     hasSubscription: hasActiveSub,
     plan: user?.subscription_plan || null,
     currentPeriodEnd: user?.subscription_current_period_end || null,
-    monthlyQuota: MONTHLY_SCAN_QUOTA,
+    monthlyQuota,
     monthlyUsed,
     monthlyRemaining: subQuotaLeft,
     topupScans: topupLeft,

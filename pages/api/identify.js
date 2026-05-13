@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
 import { getSupabaseAdmin } from '../../lib/supabase'
 import { sendMetaEvent } from '../../lib/metaPixel'
-import { MONTHLY_SCAN_QUOTA } from '../../lib/stripe'
+import { quotaForPlan } from '../../lib/stripe'
 
 export const config = {
   maxDuration: 60,
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   const sb = getSupabaseAdmin()
   const { data: user } = await sb
     .from('users')
-    .select('subscription_status, scan_period_start, monthly_scans_used, topup_scans')
+    .select('subscription_status, subscription_plan, scan_period_start, monthly_scans_used, topup_scans')
     .eq('email', session.user.email)
     .single()
 
@@ -51,7 +51,8 @@ export default async function handler(req, res) {
 
   const hasActiveSub =
     user?.subscription_status === 'active' || user?.subscription_status === 'trialing'
-  const subQuotaLeft = hasActiveSub ? Math.max(0, MONTHLY_SCAN_QUOTA - monthlyUsed) : 0
+  const monthlyQuota = quotaForPlan(user?.subscription_plan)
+  const subQuotaLeft = hasActiveSub ? Math.max(0, monthlyQuota - monthlyUsed) : 0
   const topupLeft = user?.topup_scans || 0
 
   if (subQuotaLeft + topupLeft <= 0) {
@@ -59,7 +60,7 @@ export default async function handler(req, res) {
       error: 'paywall',
       hasSubscription: hasActiveSub,
       monthlyUsed,
-      monthlyQuota: MONTHLY_SCAN_QUOTA,
+      monthlyQuota,
       topupScans: topupLeft,
     })
   }

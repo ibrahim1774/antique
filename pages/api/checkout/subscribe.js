@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   if (!session) return res.status(401).json({ error: 'unauthorized' })
 
   const { plan } = req.body || {}
-  if (!['monthly', 'yearly'].includes(plan)) {
+  if (!['monthly', 'monthly_plus', 'yearly'].includes(plan)) {
     return res.status(400).json({ error: 'invalid_plan' })
   }
 
