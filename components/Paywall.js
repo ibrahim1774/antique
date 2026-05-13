@@ -7,7 +7,7 @@ const MONTHLY_BENEFITS = [
   { icon: '🔍', text: '300 credits/month — refreshes monthly', tooltip: CREDIT_TOOLTIP },
   { icon: '➕', text: 'Top up anytime — 50 scans for $5' },
   { icon: '🏺', text: 'AI identification from any photo or angle' },
-  { icon: '✓',  text: 'Real or fake authenticity check' },
+  { icon: '✓',  text: 'Authenticity signals to help research possible fakes' },
   { icon: '💰', text: 'Potential market value + comparable listings' },
   { icon: '📁', text: 'Save & organize your full collection' },
   { icon: '💬', text: 'AI antique expert chat' },
@@ -17,7 +17,7 @@ const PLUS_BENEFITS = [
   { icon: '🎁', text: '600 credits + 300 BONUS = 900 credits/month', tooltip: CREDIT_TOOLTIP, highlight: true },
   { icon: '➕', text: 'Top up anytime — 50 scans for $5' },
   { icon: '🏺', text: 'AI identification from any photo or angle' },
-  { icon: '✓',  text: 'Real or fake authenticity check' },
+  { icon: '✓',  text: 'Authenticity signals to help research possible fakes' },
   { icon: '💰', text: 'Potential market value + comparable listings' },
   { icon: '📁', text: 'Save & organize your full collection' },
   { icon: '💬', text: 'AI antique expert chat' },
@@ -28,7 +28,7 @@ const YEARLY_BENEFITS = [
   { icon: '🔍', text: '3,600 credits/year (300/month)', tooltip: CREDIT_TOOLTIP },
   { icon: '➕', text: 'Top up anytime — 50 scans for $5' },
   { icon: '🏺', text: 'AI identification from any photo or angle' },
-  { icon: '✓',  text: 'Real or fake authenticity check' },
+  { icon: '✓',  text: 'Authenticity signals to help research possible fakes' },
   { icon: '💰', text: 'Potential market value + comparable listings' },
   { icon: '📁', text: 'Save & organize your full collection' },
   { icon: '💬', text: 'AI antique expert chat' },
@@ -136,7 +136,7 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
         <p className={styles.subtitle}>
           {mode === 'topup'
             ? 'Top up your scans or upgrade to keep researching your pieces.'
-            : 'Identify any antique. Get market value. Spot fakes.'}
+            : 'Identify any antique. Research market value and possible fakes.'}
         </p>
 
         {showSub && (

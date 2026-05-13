@@ -22,10 +22,10 @@ const CONFIDENCE_CONFIG = {
 }
 
 const AUTH_CONFIG = {
-  authentic:        { label: 'Authentic',         tone: 'good', icon: '✓' },
-  likely_authentic: { label: 'Likely Authentic',  tone: 'good', icon: '✓' },
-  likely_fake:     { label: 'Likely Fake',        tone: 'bad',  icon: '!' },
-  uncertain:       { label: 'Uncertain',          tone: 'warn', icon: '?' },
+  authentic:        { label: 'Signals point to authentic',   tone: 'good', icon: '✓' },
+  likely_authentic: { label: 'Likely authentic',             tone: 'good', icon: '✓' },
+  likely_fake:     { label: 'Possible reproduction',         tone: 'bad',  icon: '!' },
+  uncertain:       { label: 'Hard to tell — needs research', tone: 'warn', icon: '?' },
 }
 
 const CATEGORY_TAGS = ['Pottery', 'Jewelry', 'Furniture', 'Silverware', 'Coins', 'Art', 'Watches', 'Glass']
@@ -362,7 +362,7 @@ export default function Scan() {
             <div className={styles.hero}>
               <h1 className={styles.heroTitle}>Scan & Identify</h1>
               <p className={styles.heroSub}>
-                Snap any antique, collectible, or vintage piece. Get the maker, era, market value, and authenticity assessment in seconds.
+                Snap any antique, collectible, or vintage piece. Get the maker, era, market value, and authenticity signals to research — in seconds.
               </p>
             </div>
           )}

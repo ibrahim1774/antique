@@ -34,7 +34,7 @@ export default function MyScans({ scans, totals }) {
               <div className={styles.emptyIcon}>🏺</div>
               <h2 className={styles.emptyTitle}>No items yet</h2>
               <p className={styles.emptyBody}>
-                Start by scanning your first antique. Saved scans appear here with their value, category, and authenticity verdict.
+                Start by scanning your first antique. Saved scans appear here with their value, category, and authenticity signals.
               </p>
               <Link href="/scan" className={styles.emptyBtn}>
                 Scan Your First Piece →
@@ -90,7 +90,7 @@ export default function MyScans({ scans, totals }) {
                           alt={scan.item_name || 'Antique'}
                           className={styles.cardThumb}
                         />
-                        {isFake && <span className={styles.fakeBadge}>! Fake</span>}
+                        {isFake && <span className={styles.fakeBadge}>! Possible reproduction</span>}
                         {valueRange && !isFake && (
                           <span className={styles.priceBadge}>{valueRange}</span>
                         )}

@@ -9,11 +9,11 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Tivoro — Identify Any Antique. Get Market Value. Spot Fakes.</title>
-        <meta name="description" content="AI-powered antique identifier. Snap any piece — pottery, silver, jewelry, furniture — and get instant identification, market value range, authenticity assessment, and historical context. $5/month or $39/year." />
+        <title>Tivoro — Identify Antiques · Market Value · Authenticity Signals</title>
+        <meta name="description" content="AI-powered antique identifier. Snap any piece — pottery, silver, jewelry, furniture — and get a research starting point: identification, market value range, authenticity signals, and historical context. From $5/month." />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta property="og:title" content="Tivoro — AI Antique Identifier" />
-        <meta property="og:description" content="Identify any antique. Get market value. Spot fakes. Build your collection." />
+        <meta property="og:description" content="Identify any antique. Research market value and possible fakes. Build your collection." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -41,8 +41,8 @@ export default function Home() {
             Identify any antique<br />in seconds
           </h1>
           <p className={styles.heroSub}>
-            Snap a photo. Get the maker, era, origin, materials, market value range,
-            and an authenticity assessment — backed by an expert-trained AI.
+            Snap a photo. Get the maker, era, origin, materials, a market value range,
+            and authenticity signals to research — a starting point from an expert-trained AI.
           </p>
           <Link href="/scan" className={styles.heroBtn}>
             Scan an antique →
@@ -56,7 +56,7 @@ export default function Home() {
           {[
             { title: 'Scan & Identify',    body: 'Maker, era, origin, materials — in seconds.' },
             { title: 'Market Value',       body: 'Realistic USD price range with comparable sold listings.' },
-            { title: 'Real vs Fake',       body: 'Authenticity assessment with specific signals.' },
+            { title: 'Authenticity Signals', body: 'A starting point to research possible fakes or reproductions.' },
             { title: 'Manage Collection',  body: 'Save every scan. Track total estimated value.' },
             { title: 'AI Antique Helper',  body: 'Ask anything about any piece in your collection.' },
             { title: 'Learn & Discover',   body: 'Beginner guides and category deep-dives.' },
@@ -87,7 +87,7 @@ export default function Home() {
             {[
               { num: '1', title: 'Snap a photo',         body: 'The piece, its maker mark, or both. Camera or upload.' },
               { num: '2', title: 'AI identifies it',     body: 'Maker, period, origin, materials, condition — in seconds.' },
-              { num: '3', title: 'Get the full picture', body: 'Market value range, authenticity verdict, comparable listings.' },
+              { num: '3', title: 'Get the full picture', body: 'Market value range, authenticity signals, comparable listings.' },
             ].map(step => (
               <div key={step.num} className={styles.step}>
                 <div className={styles.stepNum}>{step.num}</div>
