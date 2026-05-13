@@ -2,7 +2,8 @@ import { useState } from 'react'
 import styles from '../styles/Paywall.module.css'
 
 const MONTHLY_BENEFITS = [
-  { icon: '🔍', text: '30 scans to start — refreshes every month' },
+  { icon: '🔍', text: '300 credits to start — refreshes every month' },
+  { icon: '🪙', text: 'Each scan uses 10 credits (~30 scans/month)' },
   { icon: '➕', text: 'Need more? Top up anytime — 50 scans for $5' },
   { icon: '🏺', text: 'AI identification from any photo or angle' },
   { icon: '✓',  text: 'Get help identifying real or fake items' },
@@ -12,8 +13,9 @@ const MONTHLY_BENEFITS = [
 ]
 
 const YEARLY_BENEFITS = [
-  { icon: '💛', text: 'Save 35% vs monthly — best value for collectors' },
-  { icon: '🔍', text: '360 credits total across the year (30/mo)' },
+  { icon: '💛', text: 'Save 50% vs monthly — best value for collectors' },
+  { icon: '🔍', text: '3,600 credits total per year (300/month)' },
+  { icon: '🪙', text: 'Each scan uses 10 credits (~360 scans/year)' },
   { icon: '➕', text: 'Need more? Top up anytime — 50 scans for $5' },
   { icon: '🏺', text: 'AI identification from any photo or angle' },
   { icon: '✓',  text: 'Get help identifying real or fake items' },
@@ -81,15 +83,15 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
               onClick={() => startCheckout('/api/checkout/subscribe', { plan: 'yearly' })}
               disabled={loading !== null}
             >
-              <div className={styles.discountBadge}>SAVE 35%</div>
+              <div className={styles.discountBadge}>SAVE 50%</div>
               <div className={styles.planHeader}>
                 <div className={styles.planLabel}>Yearly</div>
                 <div className={styles.bestPick}>Best value</div>
               </div>
               <div className={styles.planPriceRow}>
-                <span className={styles.planPrice}>$39</span>
+                <span className={styles.planPrice}>$29</span>
                 <span className={styles.planCadence}>/year</span>
-                <span className={styles.planEquiv}>≈ $3.25/mo</span>
+                <span className={styles.planEquiv}>≈ $2.42/mo</span>
               </div>
               <ul className={styles.benefitList}>
                 {YEARLY_BENEFITS.map(b => (

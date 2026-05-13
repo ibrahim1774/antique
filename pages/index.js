@@ -104,13 +104,13 @@ export default function Home() {
           <h2 className={styles.sectionTitle}>Simple pricing</h2>
           <div className={styles.priceGrid}>
             <div className={`${styles.priceCard} ${styles.priceFeatured}`}>
-              <div className={styles.priceBadge}>Best Value · Save 35%</div>
+              <div className={styles.priceBadge}>Best Value · Save 50%</div>
               <div className={styles.priceLabel}>Yearly</div>
               <div className={styles.priceMain}>
-                <span className={styles.priceAmt}>$39</span>
+                <span className={styles.priceAmt}>$29</span>
                 <span className={styles.priceUnit}>/year</span>
               </div>
-              <div className={styles.priceSub}>$3.25/mo · 30 scans/month</div>
+              <div className={styles.priceSub}>$2.42/mo · 30 scans/month</div>
               <Link href="/scan" className={styles.priceBtn}>Get Yearly</Link>
             </div>
             <div className={styles.priceCard}>
