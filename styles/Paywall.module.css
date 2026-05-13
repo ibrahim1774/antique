@@ -184,6 +184,59 @@
   align-items: flex-start;
   gap: 7px;
   margin-bottom: 4px;
+  position: relative;
+}
+
+.benefitText { flex: 1; }
+
+.infoWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.infoIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 13px;
+  color: #8A6614;
+  cursor: pointer;
+  user-select: none;
+  margin-left: 2px;
+  border-radius: 50%;
+}
+.infoIcon:hover { background: rgba(200,146,31,0.18); }
+
+.infoTooltip {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 5;
+  width: 220px;
+  background: #1A1610;
+  color: #FBF6EC;
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.4;
+  padding: 8px 10px;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.infoTooltip::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: 6px;
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #1A1610;
 }
 
 .benefitHighlight {

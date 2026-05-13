@@ -1,35 +1,74 @@
 import { useState } from 'react'
 import styles from '../styles/Paywall.module.css'
 
+const CREDIT_TOOLTIP = 'Each scan uses 10 credits. Identifications, value lookups, and authenticity checks all count as one scan.'
+
 const MONTHLY_BENEFITS = [
-  { icon: '🔍', text: '300 credits/month — refreshes monthly' },
-  { icon: '🪙', text: 'Each scan = 10 credits (~30 scans/mo)' },
+  { icon: '🔍', text: '300 credits/month — refreshes monthly', tooltip: CREDIT_TOOLTIP },
   { icon: '➕', text: 'Top up anytime — 50 scans for $5' },
-  { icon: '🏺', text: 'AI identification + market value' },
-  { icon: '💬', text: 'AI antique expert chat + collection' },
+  { icon: '🏺', text: 'AI identification from any photo or angle' },
+  { icon: '✓',  text: 'Real or fake authenticity check' },
+  { icon: '💰', text: 'Potential market value + comparable listings' },
+  { icon: '📁', text: 'Save & organize your full collection' },
+  { icon: '💬', text: 'AI antique expert chat' },
 ]
 
 const PLUS_BENEFITS = [
-  { icon: '🎁', text: '600 credits + 300 BONUS = 900 credits/month', highlight: true },
-  { icon: '🪙', text: 'Each scan = 10 credits (~90 scans/mo)' },
+  { icon: '🎁', text: '600 credits + 300 BONUS = 900 credits/month', tooltip: CREDIT_TOOLTIP, highlight: true },
   { icon: '➕', text: 'Top up anytime — 50 scans for $5' },
-  { icon: '🏺', text: 'AI identification + market value' },
-  { icon: '💬', text: 'AI antique expert chat + collection' },
+  { icon: '🏺', text: 'AI identification from any photo or angle' },
+  { icon: '✓',  text: 'Real or fake authenticity check' },
+  { icon: '💰', text: 'Potential market value + comparable listings' },
+  { icon: '📁', text: 'Save & organize your full collection' },
+  { icon: '💬', text: 'AI antique expert chat' },
 ]
 
 const YEARLY_BENEFITS = [
   { icon: '💛', text: 'Save 50% vs monthly — best value' },
-  { icon: '🔍', text: '3,600 credits/year (300/month)' },
-  { icon: '🪙', text: 'Each scan = 10 credits (~360 scans/yr)' },
+  { icon: '🔍', text: '3,600 credits/year (300/month)', tooltip: CREDIT_TOOLTIP },
   { icon: '➕', text: 'Top up anytime — 50 scans for $5' },
-  { icon: '🏺', text: 'AI identification + market value' },
-  { icon: '💬', text: 'AI antique expert chat + collection' },
+  { icon: '🏺', text: 'AI identification from any photo or angle' },
+  { icon: '✓',  text: 'Real or fake authenticity check' },
+  { icon: '💰', text: 'Potential market value + comparable listings' },
+  { icon: '📁', text: 'Save & organize your full collection' },
+  { icon: '💬', text: 'AI antique expert chat' },
 ]
 
 const CARD_DISCLAIMER = '* AI-powered — a research starting point, not a certified appraisal.'
 
+function InfoIcon({ tooltip, openId, setOpenId, id }) {
+  const open = openId === id
+  return (
+    <span
+      className={styles.infoWrap}
+      onClick={(e) => {
+        e.stopPropagation()
+        setOpenId(open ? null : id)
+      }}
+    >
+      <span
+        className={styles.infoIcon}
+        role="button"
+        tabIndex={0}
+        aria-label="More info"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            e.stopPropagation()
+            setOpenId(open ? null : id)
+          }
+        }}
+      >
+        ⓘ
+      </span>
+      {open && <span className={styles.infoTooltip}>{tooltip}</span>}
+    </span>
+  )
+}
+
 export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
   const [loading, setLoading] = useState(null)
+  const [openTip, setOpenTip] = useState(null)
 
   if (!isOpen) return null
 
@@ -57,12 +96,21 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
   const showTopup = mode === 'topup' || mode === 'both'
   const showSub   = mode === 'subscribe' || mode === 'both'
 
-  function renderBenefits(items) {
+  function renderBenefits(items, planKey) {
     return (
       <ul className={styles.benefitList}>
-        {items.map(b => (
+        {items.map((b, i) => (
           <li key={b.text} className={b.highlight ? styles.benefitHighlight : undefined}>
-            <span className={styles.bulletIcon}>{b.icon}</span>{b.text}
+            <span className={styles.bulletIcon}>{b.icon}</span>
+            <span className={styles.benefitText}>{b.text}</span>
+            {b.tooltip && (
+              <InfoIcon
+                tooltip={b.tooltip}
+                openId={openTip}
+                setOpenId={setOpenTip}
+                id={`${planKey}-${i}`}
+              />
+            )}
           </li>
         ))}
       </ul>
@@ -71,7 +119,10 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+      <div
+        className={styles.modal}
+        onClick={(e) => { e.stopPropagation(); setOpenTip(null) }}
+      >
         <button className={styles.closeBtn} onClick={onClose} aria-label="Close">×</button>
 
         <div className={styles.brandRow}>
@@ -102,7 +153,7 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
                 <span className={styles.planPrice}>$5</span>
                 <span className={styles.planCadence}>/month</span>
               </div>
-              {renderBenefits(MONTHLY_BENEFITS)}
+              {renderBenefits(MONTHLY_BENEFITS, 'm')}
               <div className={styles.planCta}>
                 {loading === 'monthly' ? 'Loading…' : 'Choose Monthly'}
               </div>
@@ -123,7 +174,7 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
                 <span className={styles.planCadence}>/month</span>
                 <span className={styles.planEquiv}>~$0.10/scan</span>
               </div>
-              {renderBenefits(PLUS_BENEFITS)}
+              {renderBenefits(PLUS_BENEFITS, 'p')}
               <div className={styles.planCta}>
                 {loading === 'monthly_plus' ? 'Loading…' : 'Choose Monthly Plus'}
               </div>
@@ -144,7 +195,7 @@ export default function Paywall({ isOpen, onClose, mode = 'subscribe' }) {
                 <span className={styles.planCadence}>/year</span>
                 <span className={styles.planEquiv}>≈ $2.42/mo</span>
               </div>
-              {renderBenefits(YEARLY_BENEFITS)}
+              {renderBenefits(YEARLY_BENEFITS, 'y')}
               <div className={styles.planCta}>
                 {loading === 'yearly' ? 'Loading…' : 'Choose Yearly'}
               </div>
