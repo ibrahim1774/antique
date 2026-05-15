@@ -50,3 +50,9 @@ img {
   background: rgba(26,22,16,0.2);
   border-radius: 3px;
 }
+
+@media print {
+  body { background: #fff; overflow: visible; }
+  tr { page-break-inside: avoid; }
+}
+@page { size: letter; margin: 0.5in; }

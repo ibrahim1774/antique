@@ -1,0 +1,289 @@
+/* Customer-facing proposal: /view/[token] and /proposal/[id]/print
+   Uses a light background so it prints clean and feels like a document.
+   Lives outside .qcRoot — these are public pages with their own theme. */
+
+.viewRoot {
+  background: #F6F4EF;
+  color: #1A1610;
+  font-family: 'Fraunces', Georgia, serif;
+  min-height: 100vh;
+  padding: 24px;
+}
+.viewSans {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.doc {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 14px;
+  padding: clamp(28px, 5vw, 56px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+}
+
+/* Branded header */
+.brandHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--brand-color, #D4A574);
+}
+.brandLeft { display: flex; align-items: center; gap: 14px; }
+.brandLogo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #f0ede5;
+}
+.brandName {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: #1A1610;
+}
+.brandMeta {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 12.5px;
+  color: #5A4F3F;
+  margin-top: 2px;
+  line-height: 1.5;
+}
+.brandRight {
+  text-align: right;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  color: #5A4F3F;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.brandPropNum {
+  display: block;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 14px;
+  color: #1A1610;
+  text-transform: none;
+  margin-top: 4px;
+  letter-spacing: 0;
+}
+
+.docTitle {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(28px, 4vw, 36px);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0 0 6px;
+}
+.docCustomer {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  color: #5A4F3F;
+  margin-bottom: 22px;
+}
+.docSummary {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  color: #3A3328;
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+
+.docSection {
+  margin: 22px 0;
+}
+.docSectionLabel {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brand-color, #D4A574);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.docBullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14.5px;
+  color: #1A1610;
+}
+.docBullets li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 5px 0;
+  line-height: 1.5;
+}
+.docBullets li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: var(--brand-color, #D4A574);
+  flex-shrink: 0;
+}
+
+.docTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  margin-top: 4px;
+}
+.docTable th {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5A4F3F;
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 1px solid #E6E1D6;
+}
+.docTable td {
+  padding: 10px 6px;
+  border-bottom: 1px solid #F0EDE3;
+  color: #1A1610;
+}
+.docTable .num { text-align: right; }
+.docTable tfoot td {
+  border-top: 2px solid var(--brand-color, #D4A574);
+  border-bottom: none;
+  padding-top: 14px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+.docTotalAmt { color: var(--brand-color, #D4A574); }
+
+.docMeta {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+@media (min-width: 600px) { .docMeta { grid-template-columns: 1fr 1fr; } }
+.docMetaCell { padding: 14px 16px; background: #F6F4EF; border-radius: 8px; }
+.docMetaLabel {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5A4F3F;
+  margin-bottom: 4px;
+}
+.docMetaValue { font-size: 14px; color: #1A1610; line-height: 1.4; }
+
+.docActions {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #E6E1D6;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.actionPrimary {
+  background: var(--brand-color, #D4A574);
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.actionSecondary {
+  background: #fff;
+  color: #1A1610;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 1px solid #D4CFC2;
+  cursor: pointer;
+  font-family: inherit;
+}
+.actionDecline {
+  background: #fff;
+  color: #B05858;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(176,88,88,0.3);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.sigBlock {
+  margin-top: 28px;
+  padding: 18px;
+  background: #F6F4EF;
+  border-radius: 10px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.sigInput {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #D4CFC2;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+.sigCheck {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #3A3328;
+  margin-bottom: 14px;
+}
+
+.docStatus {
+  background: #EEF7F0;
+  border: 1px solid #C8E2CD;
+  color: #2C6B3B;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  margin-top: 24px;
+}
+.docStatus.declined {
+  background: #FBEEEC;
+  border-color: #E5C5BF;
+  color: #944747;
+}
+
+.docFooter {
+  text-align: center;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 11.5px;
+  color: #8A8070;
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid #E6E1D6;
+  letter-spacing: 0.04em;
+}
+.docFooter a { color: var(--brand-color, #D4A574); text-decoration: none; }
+
+/* ---------- Print rules ---------- */
+@media print {
+  .viewRoot { background: #fff; padding: 0; }
+  .doc { box-shadow: none; border-radius: 0; max-width: none; padding: 0; }
+  .noPrint { display: none !important; }
+  .docTable thead { display: table-header-group; }
+  .docSection { page-break-inside: avoid; }
+  .docFooter { page-break-inside: avoid; }
+}
