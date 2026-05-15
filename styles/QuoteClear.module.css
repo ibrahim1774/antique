@@ -18,7 +18,7 @@
   --qc-gold-border: rgba(212,165,116,0.32);
   --qc-radius: 12px;
   --qc-radius-lg: 18px;
-  --qc-section-pad: clamp(56px, 8vw, 112px);
+  --qc-section-pad: clamp(40px, 6vw, 72px);
 
   background: var(--qc-bg);
   color: var(--qc-text);
@@ -97,7 +97,7 @@
 /* ---------- Hero ---------- */
 
 .hero {
-  padding: clamp(64px, 10vw, 128px) 0 clamp(48px, 8vw, 96px);
+  padding: clamp(40px, 6vw, 80px) 0 clamp(28px, 5vw, 56px);
   position: relative;
   overflow: hidden;
 }
@@ -112,44 +112,44 @@
 .heroGrid {
   position: relative;
   display: grid;
-  gap: 56px;
+  gap: 36px;
   grid-template-columns: 1fr;
   align-items: center;
 }
 @media (min-width: 920px) {
-  .heroGrid { grid-template-columns: 1.05fr 1fr; gap: 72px; }
+  .heroGrid { grid-template-columns: 1.05fr 1fr; gap: 48px; }
 }
 .heroEyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 11.5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--qc-gold);
-  padding: 6px 12px;
+  padding: 5px 11px;
   border: 1px solid var(--qc-gold-border);
   border-radius: 999px;
   background: var(--qc-gold-soft);
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 .heroTitle {
   font-family: 'Fraunces', Georgia, serif;
   font-weight: 500;
-  font-size: clamp(36px, 6vw, 64px);
+  font-size: clamp(30px, 5vw, 52px);
   line-height: 1.04;
   letter-spacing: -0.025em;
-  margin: 0 0 18px;
+  margin: 0 0 14px;
 }
 .heroTitle em {
   font-style: italic;
   color: var(--qc-gold);
 }
 .heroSub {
-  font-size: clamp(15px, 1.6vw, 18px);
+  font-size: clamp(14px, 1.4vw, 16.5px);
   color: var(--qc-text-muted);
-  margin: 0 0 32px;
-  max-width: 540px;
+  margin: 0 0 22px;
+  max-width: 520px;
   line-height: 1.5;
 }
 .heroCtas { display: flex; gap: 14px; flex-wrap: wrap; }
@@ -185,8 +185,8 @@
 }
 .btnGhost:hover { border-color: var(--qc-text-muted); background: rgba(255,255,255,0.03); }
 .heroTrades {
-  margin-top: 28px;
-  font-size: 13px;
+  margin-top: 20px;
+  font-size: 12.5px;
   color: var(--qc-text-dim);
 }
 
@@ -246,25 +246,25 @@
   padding: var(--qc-section-pad) 0;
   border-top: 1px solid var(--qc-divider);
 }
-.sectionHead { max-width: 720px; margin: 0 auto 56px; text-align: center; }
+.sectionHead { max-width: 700px; margin: 0 auto 36px; text-align: center; }
 .sectionEyebrow {
-  font-size: 12px;
+  font-size: 11.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--qc-gold);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 .sectionTitle {
   font-family: 'Fraunces', Georgia, serif;
   font-weight: 500;
-  font-size: clamp(28px, 4vw, 42px);
+  font-size: clamp(24px, 3.4vw, 34px);
   line-height: 1.1;
   letter-spacing: -0.02em;
-  margin: 0 0 14px;
+  margin: 0 0 10px;
 }
 .sectionLede {
   color: var(--qc-text-muted);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
   margin: 0;
 }
@@ -382,7 +382,7 @@
   }
 }
 .statCell {
-  padding: 28px 24px;
+  padding: 22px 20px;
   border-top: 1px solid var(--qc-divider);
 }
 @media (min-width: 760px) {
@@ -391,13 +391,13 @@
 }
 .statNumber {
   font-family: 'Fraunces', Georgia, serif;
-  font-size: clamp(38px, 4.5vw, 56px);
+  font-size: clamp(32px, 3.8vw, 46px);
   line-height: 1;
   color: var(--qc-gold);
   letter-spacing: -0.02em;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
-.statBody { color: var(--qc-text-muted); font-size: 14.5px; line-height: 1.5; max-width: 320px; }
+.statBody { color: var(--qc-text-muted); font-size: 14px; line-height: 1.5; max-width: 320px; }
 
 /* ---------- Steps ---------- */
 .stepGrid {
@@ -540,6 +540,37 @@
   font-size: 10px;
   margin-top: 3px;
   font-weight: 700;
+}
+.priceCheckOff {
+  flex-shrink: 0;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  color: var(--qc-text-dim);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  margin-top: 3px;
+}
+.priceFeatureOff {
+  color: var(--qc-text-dim) !important;
+  text-decoration: line-through;
+  text-decoration-color: rgba(255,255,255,0.18);
+}
+.priceFeatureHighlight {
+  background: var(--qc-gold-soft);
+  border-left: 2px solid var(--qc-gold);
+  padding: 6px 10px !important;
+  margin-left: -10px;
+  margin-right: -10px;
+  border-radius: 0 8px 8px 0;
+  color: var(--qc-text) !important;
+  font-weight: 500;
+}
+.priceFeatureHighlight .priceCheck {
+  background: var(--qc-gold);
+  color: var(--qc-bg);
 }
 .priceCta {
   width: 100%;

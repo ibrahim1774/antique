@@ -6,6 +6,8 @@ import Layout from '../../components/contractor-quotes/Layout'
 import qc from '../../styles/QuoteClear.module.css'
 import app from '../../styles/QuoteClearApp.module.css'
 
+// Every card shows every feature, with the differentiators highlighted
+// so contractors can see exactly what they get and what's extra.
 const PLANS = [
   {
     key: 'starter',
@@ -14,11 +16,17 @@ const PLANS = [
     unit: '/mo',
     tagline: 'For solo operators sending a handful of quotes a month.',
     features: [
-      '10 proposals per month',
-      '1 user',
-      'Basic templates',
-      'Print / save-as-PDF',
-      'Customer share links',
+      { label: '10 proposals per month',          included: true, highlight: true },
+      { label: 'AI proposal rewriting (GPT-4o)',  included: true },
+      { label: 'Customer share links',            included: true },
+      { label: 'View tracking & status updates',  included: true },
+      { label: 'Print / save-as-PDF',             included: true },
+      { label: 'Basic templates',                 included: true },
+      { label: '1 user',                          included: true },
+      { label: 'Custom branding (logo + color)',  included: false },
+      { label: 'Trade-specific templates',        included: false },
+      { label: 'Change orders',                   included: false },
+      { label: 'Priority support',                included: false },
     ],
   },
   {
@@ -28,12 +36,17 @@ const PLANS = [
     unit: '/mo',
     tagline: 'For active contractors who quote weekly.',
     features: [
-      '30 proposals per month',
-      'Custom branding (logo + color)',
-      'Trade-specific templates',
-      'Change orders',
-      'Shareable view-tracked links',
-      'Priority support',
+      { label: '30 proposals per month',          included: true, highlight: true },
+      { label: 'AI proposal rewriting (GPT-4o)',  included: true },
+      { label: 'Customer share links',            included: true },
+      { label: 'View tracking & status updates',  included: true },
+      { label: 'Print / save-as-PDF',             included: true },
+      { label: 'Basic templates',                 included: true },
+      { label: '1 user',                          included: true },
+      { label: 'Custom branding (logo + color)',  included: true, highlight: true },
+      { label: 'Trade-specific templates',        included: true, highlight: true },
+      { label: 'Change orders',                   included: true, highlight: true },
+      { label: 'Priority support',                included: true, highlight: true },
     ],
     featured: true,
     badge: 'Most Popular',
@@ -45,11 +58,19 @@ const PLANS = [
     unit: '/mo',
     tagline: 'For crews running multiple jobs at once.',
     features: [
-      'Unlimited proposals',
-      'Up to 5 users',
-      'Shared team templates',
-      'Approval workflow',
-      'Priority support',
+      { label: 'Unlimited proposals',             included: true, highlight: true },
+      { label: 'AI proposal rewriting (GPT-4o)',  included: true },
+      { label: 'Customer share links',            included: true },
+      { label: 'View tracking & status updates',  included: true },
+      { label: 'Print / save-as-PDF',             included: true },
+      { label: 'Basic templates',                 included: true },
+      { label: 'Custom branding (logo + color)',  included: true },
+      { label: 'Trade-specific templates',        included: true },
+      { label: 'Change orders',                   included: true },
+      { label: 'Priority support',                included: true },
+      { label: 'Up to 5 users',                   included: true, highlight: true },
+      { label: 'Shared team templates',           included: true, highlight: true },
+      { label: 'Approval workflow',               included: true, highlight: true },
     ],
   },
 ]
@@ -110,6 +131,7 @@ export default function Billing() {
 
   const justPaid = !!router.query.session_id
   const cancelled = !!router.query.cancelled
+  const welcome = !!router.query.welcome
   const active = billing?.hasSubscription
 
   return (
@@ -119,9 +141,13 @@ export default function Billing() {
           <div className={app.crumb}>
             <Link href="/contractor-quotes/dashboard">Dashboard</Link> · Billing
           </div>
-          <h1 className={app.pageTitle}>Billing</h1>
+          <h1 className={app.pageTitle}>
+            {welcome && !active ? 'Pick a plan to get started' : 'Billing'}
+          </h1>
           <p className={app.pageLede}>
-            Pick the plan that fits how often you quote. Change or cancel anytime.
+            {welcome && !active
+              ? 'Welcome to QuoteClear. Pick a plan to start sending proposals — every plan includes the full AI rewrite engine and shareable customer links.'
+              : 'Pick the plan that fits how often you quote. Change or cancel anytime.'}
           </p>
 
           {justPaid && (
@@ -185,9 +211,14 @@ export default function Billing() {
                   <p className={qc.priceTagline}>{p.tagline}</p>
                   <ul className={qc.priceList}>
                     {p.features.map(f => (
-                      <li key={f}>
-                        <span className={qc.priceCheck}>✓</span>
-                        {f}
+                      <li
+                        key={f.label}
+                        className={f.highlight ? qc.priceFeatureHighlight : (f.included ? '' : qc.priceFeatureOff)}
+                      >
+                        <span className={f.included ? qc.priceCheck : qc.priceCheckOff}>
+                          {f.included ? '✓' : '—'}
+                        </span>
+                        {f.label}
                       </li>
                     ))}
                   </ul>

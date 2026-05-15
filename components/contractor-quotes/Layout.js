@@ -20,9 +20,9 @@ export default function Layout({ children, title, description }) {
             Quote<span>Clear</span>
           </Link>
           <div className={styles.navLinks}>
-            <a href="#pricing" className={styles.navLink}>Pricing</a>
+            <a href="#demo" className={styles.navLink}>Demo</a>
             <a href="#faq" className={styles.navLink}>FAQ</a>
-            <Link href="/contractor-quotes/login" className={styles.navCta}>Sign in</Link>
+            <Link href="/contractor-quotes/login" className={styles.navCta}>Sign up</Link>
           </div>
         </div>
       </nav>
@@ -33,9 +33,9 @@ export default function Layout({ children, title, description }) {
         <div className={styles.footerInner}>
           <div>© {new Date().getFullYear()} QuoteClear · Built for contractors who close.</div>
           <div className={styles.footerLinks}>
-            <a href="#pricing">Pricing</a>
+            <a href="#demo">Demo</a>
             <a href="#faq">FAQ</a>
-            <Link href="/contractor-quotes/login">Sign in</Link>
+            <Link href="/contractor-quotes/login">Sign up</Link>
           </div>
         </div>
       </footer>

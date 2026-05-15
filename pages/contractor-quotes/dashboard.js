@@ -45,14 +45,22 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (status !== 'authenticated') return
-    fetch('/api/contractor-quotes/proposal/list')
-      .then(r => r.ok ? r.json() : { proposals: [] })
-      .then(d => setProposals(d.proposals || []))
     fetch('/api/contractor-quotes/billing/status')
       .then(r => r.ok ? r.json() : null)
-      .then(setBilling)
+      .then(b => {
+        setBilling(b)
+        // No active plan? Force them through the paywall before showing
+        // the dashboard. First-time signups land here from /login.
+        if (b && !b.hasSubscription) {
+          router.replace('/contractor-quotes/billing?welcome=1')
+          return
+        }
+        fetch('/api/contractor-quotes/proposal/list')
+          .then(r => r.ok ? r.json() : { proposals: [] })
+          .then(d => setProposals(d.proposals || []))
+      })
       .catch(() => setBilling(null))
-  }, [status])
+  }, [status, router])
 
   const accepted = proposals?.filter(p => p.status === 'accepted') || []
   const totalAccepted = accepted.reduce((s, p) => s + (Number(p.total_amount) || 0), 0)

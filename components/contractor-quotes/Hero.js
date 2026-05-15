@@ -29,8 +29,8 @@ export default function Hero() {
               Built for contractors who&apos;d rather be on the job than at a desk.
             </p>
             <div className={styles.heroCtas}>
-              <a href="#demo" className={styles.btnPrimary}>See it in action →</a>
-              <Link href="/contractor-quotes/login" className={styles.btnGhost}>Sign in</Link>
+              <Link href="/contractor-quotes/login" className={styles.btnPrimary}>Sign up →</Link>
+              <a href="#demo" className={styles.btnGhost}>See it in action</a>
             </div>
             <p className={styles.heroTrades}>
               Built for roofers, HVAC, plumbers, electricians, painters, and GCs
