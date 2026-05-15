@@ -170,7 +170,7 @@
 .input:focus, .textarea:focus { border-color: var(--qc-gold-border); }
 .textarea {
   min-height: 220px;
-  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.55;
   resize: vertical;
