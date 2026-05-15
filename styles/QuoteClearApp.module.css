@@ -1,0 +1,335 @@
+/* QuoteClear app shell — dashboard, /new, /proposal/[id]. Lives inside .qcRoot. */
+
+.appShell {
+  padding: clamp(32px, 5vw, 64px) 0 96px;
+}
+
+.crumb {
+  font-size: 12.5px;
+  color: var(--qc-text-dim);
+  margin-bottom: 14px;
+  letter-spacing: 0.02em;
+}
+.crumb a { color: var(--qc-text-muted); text-decoration: none; }
+.crumb a:hover { color: var(--qc-gold); }
+
+.pageTitle {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(28px, 4vw, 38px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+.pageLede {
+  color: var(--qc-text-muted);
+  font-size: 15px;
+  margin: 0 0 32px;
+  max-width: 640px;
+}
+
+/* ---------- Dashboard ---------- */
+.dashHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.dashStats {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 28px;
+}
+.dashStat {
+  background: var(--qc-bg-elevated);
+  border: 1px solid var(--qc-divider);
+  border-radius: var(--qc-radius);
+  padding: 18px 20px;
+}
+.dashStatLabel {
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--qc-text-dim);
+  margin-bottom: 6px;
+}
+.dashStatValue {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: var(--qc-text);
+}
+.dashStatSub { color: var(--qc-text-muted); font-size: 12.5px; margin-top: 4px; }
+
+.proposalList {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--qc-divider);
+  border-radius: var(--qc-radius);
+  background: var(--qc-bg-elevated);
+  overflow: hidden;
+}
+.proposalRow {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 110px;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--qc-divider);
+  text-decoration: none;
+  color: inherit;
+  transition: background 200ms ease-out;
+}
+.proposalRow:first-child { border-top: none; }
+.proposalRow:hover { background: rgba(255,255,255,0.02); }
+.proposalTitle {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--qc-text);
+}
+.proposalSub { font-size: 12.5px; color: var(--qc-text-dim); margin-top: 2px; }
+.proposalCust { color: var(--qc-text-muted); font-size: 14px; }
+.proposalAmount {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 18px;
+  color: var(--qc-text);
+  letter-spacing: -0.01em;
+}
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.statusDraft     { background: rgba(255,255,255,0.06); color: var(--qc-text-muted); }
+.statusSent      { background: rgba(180,200,255,0.10); color: #B4C8FF; }
+.statusViewed    { background: rgba(212,165,116,0.12); color: var(--qc-gold); }
+.statusAccepted  { background: rgba(124,200,140,0.14); color: #7CC88C; }
+.statusDeclined  { background: rgba(232,154,138,0.14); color: #E89A8A; }
+
+.emptyState {
+  border: 1px dashed var(--qc-divider-strong);
+  border-radius: var(--qc-radius-lg);
+  padding: 48px 24px;
+  text-align: center;
+}
+.emptyIcon {
+  width: 56px; height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--qc-gold-soft);
+  border: 1px solid var(--qc-gold-border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--qc-gold);
+}
+.emptyTitle {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+.emptyBody { color: var(--qc-text-muted); font-size: 14px; margin: 0 0 24px; }
+
+/* ---------- /new proposal form ---------- */
+.formCard {
+  background: var(--qc-bg-elevated);
+  border: 1px solid var(--qc-divider);
+  border-radius: var(--qc-radius-lg);
+  padding: clamp(20px, 3vw, 32px);
+}
+.fieldRow { display: grid; gap: 14px; grid-template-columns: 1fr; margin-bottom: 14px; }
+@media (min-width: 760px) {
+  .fieldRow.cols2 { grid-template-columns: 1fr 1fr; }
+}
+.field { display: flex; flex-direction: column; }
+.label {
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--qc-text-dim);
+  margin-bottom: 6px;
+}
+.input, .textarea {
+  width: 100%;
+  background: var(--qc-bg);
+  color: var(--qc-text);
+  border: 1px solid var(--qc-divider);
+  border-radius: 10px;
+  padding: 11px 13px;
+  font-size: 14.5px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 200ms ease-out;
+}
+.input:focus, .textarea:focus { border-color: var(--qc-gold-border); }
+.textarea {
+  min-height: 220px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.errorBox {
+  color: #E89A8A;
+  background: rgba(232,154,138,0.08);
+  border: 1px solid rgba(232,154,138,0.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  margin-top: 16px;
+}
+.paywallBox {
+  color: var(--qc-gold);
+  background: var(--qc-gold-soft);
+  border: 1px solid var(--qc-gold-border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  font-size: 14.5px;
+  margin-top: 16px;
+}
+
+/* ---------- /proposal/[id] editor ---------- */
+.editorGrid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1000px) {
+  .editorGrid { grid-template-columns: 1.1fr 1fr; }
+}
+.editorPane {
+  background: var(--qc-bg-elevated);
+  border: 1px solid var(--qc-divider);
+  border-radius: var(--qc-radius-lg);
+  padding: clamp(18px, 2.5vw, 28px);
+}
+.editorPaneHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--qc-divider);
+}
+.editorPaneTitle {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.sectionH {
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--qc-text-dim);
+  margin: 18px 0 8px;
+}
+
+.lineItemTable {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lineItem {
+  display: grid;
+  grid-template-columns: 2fr 60px 90px 90px 36px;
+  gap: 8px;
+  align-items: center;
+}
+.lineItem input {
+  background: var(--qc-bg);
+  color: var(--qc-text);
+  border: 1px solid var(--qc-divider);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13.5px;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+}
+.lineItem input:focus { border-color: var(--qc-gold-border); }
+.lineItemHead {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--qc-text-dim);
+  padding: 0 4px;
+}
+.removeBtn {
+  background: transparent;
+  border: 1px solid var(--qc-divider);
+  color: var(--qc-text-muted);
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.removeBtn:hover { color: #E89A8A; border-color: rgba(232,154,138,0.4); }
+.addLineBtn {
+  margin-top: 8px;
+  background: transparent;
+  color: var(--qc-text-muted);
+  border: 1px dashed var(--qc-divider-strong);
+  border-radius: 8px;
+  padding: 9px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  transition: color 200ms ease-out, border-color 200ms ease-out;
+}
+.addLineBtn:hover { color: var(--qc-gold); border-color: var(--qc-gold-border); }
+
+.bulletList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.bulletList li {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+  align-items: flex-start;
+}
+.bulletList li::before {
+  content: '•';
+  color: var(--qc-gold);
+  margin-top: 2px;
+}
+.bulletEdit {
+  width: 100%;
+  background: var(--qc-bg);
+  color: var(--qc-text);
+  border: 1px solid var(--qc-divider);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13.5px;
+  font-family: inherit;
+}
+
+.editorActions {
+  position: sticky;
+  bottom: 0;
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+  border-top: 1px solid var(--qc-divider);
+}
+.savedNote { color: #7CC88C; font-size: 13px; align-self: center; }
+.savingNote { color: var(--qc-text-muted); font-size: 13px; align-self: center; }
